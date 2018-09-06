@@ -20,9 +20,8 @@ var cardParams = {
 
 var map = document.querySelector('.map');
 var mapPinsElement = document.querySelector('.map__pins');
+var mapPinElement = document.querySelector('.map__pin');
 var mapFilters = document.querySelector('.map__filters-container');
-// var mapPin = document.querySelector('#card').content.querySelector('.map__card');
-// var mapPinElement = document.querySelector('#pin').content.querySelector('.map__pin');
 
 // функция получения рандомного значения между min и max
 var getRandomValue = function (min, max) {
@@ -104,22 +103,10 @@ var renderPin = function (card) {
       .content
       .querySelector('.map__pin')
       .cloneNode(true);
-  pinElement.style = 'left: ' + card.location.x + 'px; top: ' + card.location.y + 'px;';
+  pinElement.style = 'left: ' + (card.location.x - (parseInt(mapPinElement.offsetWidth, 10)) / 2) + 'px; top: ' + (card.location.y - (parseInt(mapPinElement.offsetHeight, 10))) + 'px;';
   pinElement.querySelector('img').src = card.author.avatar;
   pinElement.querySelector('img').alt = card.offer.title;
   return pinElement;
-};
-
-// функция отрисовки сгенерированных элементов
-var renderElements = function () {
-  var cards = getCards(cardParams.COUNT, mapPinsElement);
-  var fragment = document.createDocumentFragment();
-  for (var i = 0; i < cards.length; i++) {
-    fragment.appendChild(renderPin(cards[i]));
-  }
-  mapPinsElement.appendChild(fragment);
-  fragment.appendChild(renderCard(cards[0]));
-  map.insertBefore(fragment, mapFilters);
 };
 
 // функция создания в DOMе объявления и заполнения его данными
@@ -136,24 +123,33 @@ var renderCard = function (card) {
   cardElement.querySelector('.popup__text--capacity').textContent = card.offer.rooms + ' комнаты для ' + card.offer.guests + ' гостей.';
   cardElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + card.offer.checkin + ', выезд до ' + card.offer.checkout;
   if (card.offer.features.length === 0) {
-    cardElement.querySelector('.popup__features').style = 'display: none;';
+    cardElement.removeChild(cardElement.querySelector('.popup__features'));
   } else {
-    for (var i = card.offer.features.length; i < cardParams.FEATURES.length; i++) {
-      cardElement.querySelector('.popup__features').children[i].style = 'display: none;';
+    for (var i = cardParams.FEATURES.length - 1; i >= card.offer.features.length; i--) {
+      cardElement.querySelector('.popup__features').removeChild(cardElement.querySelector('.popup__features').childNodes[i]);
     }
   }
   cardElement.querySelector('.popup__description').textContent = card.offer.description;
   var photo = cardElement.querySelector('.popup__photo');
-  for (i = 0; i < card.offer.photos.length; i++) {
-    if (i === 0) {
-      photo.src = card.offer.photos[i];
-    } else {
-      var photoClone = photo.cloneNode();
-      photoClone.src = card.offer.photos[i];
-      cardElement.querySelector('.popup__photos').appendChild(photoClone);
-    }
+  photo.src = card.offer.photos[0];
+  for (i = 1; i < card.offer.photos.length; i++) {
+    var photoClone = photo.cloneNode();
+    photoClone.src = card.offer.photos[i];
+    cardElement.querySelector('.popup__photos').appendChild(photoClone);
   }
   return cardElement;
+};
+
+// функция отрисовки сгенерированных элементов
+var renderElements = function () {
+  var cards = getCards(cardParams.COUNT, mapPinsElement);
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i < cards.length; i++) {
+    fragment.appendChild(renderPin(cards[i]));
+  }
+  mapPinsElement.appendChild(fragment);
+  fragment.appendChild(renderCard(cards[0]));
+  map.insertBefore(fragment, mapFilters);
 };
 
 map.classList.remove('map--faded');
