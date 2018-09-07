@@ -108,7 +108,7 @@ var renderPin = function (card) {
 
 // функция создания в DOMe блока удобст и заполнение его данными
 var renderFeatures = function (element, parent, arr) {
-  if (arr.isPrototypeOf > 0) {
+  if (arr[0] !== undefined) {
     for (var i = 0; i < arr.length; i++) {
       var li = document.createElement('li');
       li.classList.add('popup__feature', 'popup__feature--' + arr[i]);
