@@ -51,12 +51,15 @@ var mixRandomArray = function (arr) {
 
 // функция получения массива случайной длины
 var getArrayRandomLight = function (arr, number) {
-  var obj = {};
-  while (Object.keys(obj).length < number) {
+  var resultArr = [];
+  while (resultArr.length < number) {
     var index = getRandomValue(0, arr.length);
-    obj[arr[index]] = true;
+    var temp = arr[index];
+    if (resultArr.indexOf(temp) === -1) {
+      resultArr.push(temp);
+    }
   }
-  return Object.keys(obj);
+  return resultArr;
 };
 
 // функция заполнения свойства avatar
@@ -66,21 +69,22 @@ var getAvatar = function (number) {
 
 // функция возвращает объект card
 var getCardObject = function (number, parentElement, mixArr) {
-  var card = {};
-  card.avatar = getAvatar(number + 1);
-  card.title = mixArr[number];
-  card.x = getRandomValue(0, parentElement.offsetWidth);
-  card.y = getRandomValue(cardParams.Y_MIN, cardParams.Y_MAX);
+  var card = {
+    avatar: getAvatar(number + 1),
+    title: mixArr[number],
+    x: getRandomValue(0, parentElement.offsetWidth),
+    y: getRandomValue(cardParams.Y_MIN, cardParams.Y_MAX),
+    price: getRandomValue(cardParams.PRICE_MIN, cardParams.PRICE_MAX),
+    type: Object.keys(cardParams.TYPES_OFFER)[getRandomValue(0, Object.keys(cardParams.TYPES_OFFER).length)],
+    rooms: getRandomValue(cardParams.ROOMS_MIN, cardParams.ROOMS_MAX + 1),
+    guests: getRandomValue(cardParams.GUESTS_MIN, cardParams.ROOMS_MAX * 3),
+    checkin: cardParams.CHECKIN[getRandomValue(0, cardParams.CHECKIN.length)],
+    checkout: cardParams.CHECKOUT[getRandomValue(0, cardParams.CHECKOUT.length)],
+    features: getArrayRandomLight(cardParams.FEATURES, getRandomValue(0, cardParams.FEATURES.length)),
+    description: '',
+    photos: mixRandomArray(cardParams.PHOTOS)
+  };
   card.address = card.x + ', ' + card.y;
-  card.price = getRandomValue(cardParams.PRICE_MIN, cardParams.PRICE_MAX);
-  card.type = Object.keys(cardParams.TYPES_OFFER)[getRandomValue(0, Object.keys(cardParams.TYPES_OFFER).length)];
-  card.rooms = getRandomValue(cardParams.ROOMS_MIN, cardParams.ROOMS_MAX + 1);
-  card.guests = getRandomValue(cardParams.GUESTS_MIN, cardParams.ROOMS_MAX * 3);
-  card.checkin = cardParams.CHECKIN[getRandomValue(0, cardParams.CHECKIN.length)];
-  card.checkout = cardParams.CHECKOUT[getRandomValue(0, cardParams.CHECKOUT.length)];
-  card.features = getArrayRandomLight(cardParams.FEATURES, getRandomValue(0, cardParams.FEATURES.length));
-  card.description = '';
-  card.photos = mixRandomArray(cardParams.PHOTOS);
   return card;
 };
 
@@ -108,7 +112,8 @@ var renderPin = function (card) {
 
 // функция создания в DOMe блока удобст и заполнение его данными
 var renderFeatures = function (element, parent, arr) {
-  if (arr[0] !== undefined) {
+  var isEmpty = !!arr.length;
+  if (isEmpty) {
     for (var i = 0; i < arr.length; i++) {
       var li = document.createElement('li');
       li.classList.add('popup__feature', 'popup__feature--' + arr[i]);
@@ -120,19 +125,23 @@ var renderFeatures = function (element, parent, arr) {
 };
 
 // функция заполнения блока popup__photos значениями
-var renderPhotos = function (element, parent, arr) {
-  for (var i = 1; i < arr.length; i++) {
-    var photoClone = element.cloneNode();
-    photoClone.src = arr[i];
-    parent.appendChild(photoClone);
+var renderPhotos = function (parent, arr) {
+  for (var i = 0; i < arr.length; i++) {
+    var image = document.createElement('img');
+    image.classList.add('popup__photo');
+    image.src = arr[i];
+    image.width = 45;
+    image.height = 40;
+    image.alt = 'Фотография жилья';
+    parent.appendChild(image);
   }
 };
 
 // функция создания в DOMе объявления и заполнения его данными
 var renderCard = function (card) {
   var cardElement = cardTemplateElement.cloneNode(true);
-  var ul = cardElement.querySelector('.popup__features');
-  var photo = cardElement.querySelector('.popup__photo');
+  var ulFeatures = cardElement.querySelector('.popup__features');
+  var photosContainer = cardElement.querySelector('.popup__photos');
   cardElement.querySelector('.popup__avatar').src = card.avatar;
   cardElement.querySelector('.popup__title').textContent = card.title;
   cardElement.querySelector('.popup__text--address').textContent = card.address;
@@ -140,10 +149,9 @@ var renderCard = function (card) {
   cardElement.querySelector('.popup__type').textContent = cardParams.TYPES_OFFER[card.type];
   cardElement.querySelector('.popup__text--capacity').textContent = card.rooms + ' комнаты для ' + card.guests + ' гостей.';
   cardElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + card.checkin + ', выезд до ' + card.checkout;
-  renderFeatures(ul, cardElement, card.features);
+  renderFeatures(ulFeatures, cardElement, card.features);
   cardElement.querySelector('.popup__description').textContent = card.description;
-  photo.src = card.photos[0];
-  renderPhotos(photo, cardElement.querySelector('.popup__photos'), card.photos);
+  renderPhotos(photosContainer, card.photos);
   return cardElement;
 };
 
