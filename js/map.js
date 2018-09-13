@@ -51,19 +51,21 @@ var map = document.querySelector('.map');
 var mapPinsElement = document.querySelector('.map__pins');
 var mapPinElement = document.querySelector('.map__pin');
 var mapFilters = document.querySelector('.map__filters-container');
+var mainPin = document.querySelector('.map__pin--main');
+
 var pinTemplateElement = document.querySelector('#pin')
   .content
   .querySelector('.map__pin');
 var cardTemplateElement = document.querySelector('#card')
   .content
   .querySelector('.map__card');
+
 var adForm = document.querySelector('.ad-form');
-var adFieldsets = adForm.querySelectorAll('.ad-form__element');
-var adAdress = adForm.querySelector('input[name=address]');
-var mainPin = document.querySelector('.map__pin--main');
+var adFieldsets = adForm.querySelectorAll('.ad-form-header, .ad-form__element');
+var adAddress = adForm.querySelector('input[name=address]');
+
 var mapFiltersForm = document.querySelector('.map__filters');
 var mapFiltersFields = mapFiltersForm.querySelectorAll('.map__filter, .map__features');
-var cards = [];
 
 // функция получения рандомного значения между min и max
 var getRandomValue = function (min, max) {
@@ -139,6 +141,7 @@ var renderPin = function (card) {
   pinElement.style = 'left: ' + (card.x - widthPin / 2) + 'px; top: ' + (card.y - heightPin) + 'px;';
   imgPin.src = card.avatar;
   imgPin.alt = card.title;
+  pinElement.mycard = card;
   return pinElement;
 };
 
@@ -195,11 +198,10 @@ var renderCard = function (card) {
 };
 
 // функция отрисовки сгенерированных меток
-var renderPins = function () {
+var renderPins = function (arr) {
   var fragment = document.createDocumentFragment();
-  cards = getCards(cardParams.COUNT, mapPinsElement);
-  for (var i = 0; i < cards.length; i++) {
-    fragment.appendChild(renderPin(cards[i]));
+  for (var i = 0; i < arr.length; i++) {
+    fragment.appendChild(renderPin(arr[i]));
   }
   mapPinsElement.appendChild(fragment);
 };
@@ -211,26 +213,36 @@ var renderCardElement = function (card) {
   map.insertBefore(fragment, mapFilters);
 };
 
-// функция-обработчик отпускания мышью метки адреса
-var onMainPinMouseup = function () {
+// функция активации полей
+var activationFields = function (arr) {
+  arr.forEach(function (item) {
+    item.removeAttribute('disabled');
+  });
+};
+
+// функция вычисления координат для поля Адрес
+var calculateLocation = function () {
   var locationX = Math.round(mainPin.offsetLeft + mainPin.offsetWidth / 2);
   var locationY = mainPin.offsetTop + mainPin.offsetHeight;
+  return locationX + ', ' + locationY;
+};
+
+// функция-обработчик отпускания мышью метки адреса
+var onMainPinMouseup = function () {
   if (map.classList.contains('map--faded')) {
-    renderPins();
+    var cards = getCards(cardParams.COUNT, mapPinsElement);
+    renderPins(cards);
+    var similarPins = mapPinsElement.querySelectorAll('.map__pin:not(.map__pin--main)');
+    similarPins.forEach(function (item) {
+      item.addEventListener('click', onPinClick);
+    });
   }
   map.classList.remove('map--faded');
   adForm.classList.remove('ad-form--disabled');
-  for (var i = 0; i < adFieldsets.length; i++) {
-    adFieldsets[i].removeAttribute('disabled');
-  }
-  for (i = 0; i < mapFiltersFields.length; i++) {
-    mapFiltersFields[i].removeAttribute('disabled');
-  }
-  adAdress.setAttribute('value', locationX + ', ' + locationY);
+  activationFields(adFieldsets);
+  activationFields(mapFiltersFields);
+  adAddress.value = calculateLocation();
 };
-
-// обработчик отпускания мышью метки адреса
-mainPin.addEventListener('mouseup', onMainPinMouseup);
 
 // функция удаляет popup из DOMа
 var closePopup = function () {
@@ -254,39 +266,35 @@ var onPopupPressEsc = function (evt) {
 // функция-обработчик нажатия на метку похожего объявления
 var onPinClick = function (evt) {
   var target = evt.target;
-  if (target !== mainPin.querySelector('img') && target.parentElement.classList.contains('map__pin')) {
-    var targetSrc = target.getAttribute('src');
-    var targetAlt = target.getAttribute('alt');
-    for (var i = 0; i < cards.length; i++) {
-      if (targetSrc === cards[i].avatar && targetAlt === cards[i].title) {
-        if (map.querySelector('.popup')) {
-          closePopup();
-        }
-        renderCardElement(cards[i]);
-        map.querySelector('.popup__close').addEventListener('click', onPopupCloseClick);
-        document.addEventListener('keydown', onPopupPressEsc);
-      }
-    }
-    target.parentElement.classList.add('map__pin--active');
+  if (map.querySelector('.popup')) {
+    closePopup();
   }
+  var pin = target.childrenElementCount ? target : target.parentElement;
+  renderCardElement(pin.mycard);
+  pin.classList.add('map__pin--active');
+  map.querySelector('.popup__close').addEventListener('click', onPopupCloseClick);
+  document.addEventListener('keydown', onPopupPressEsc);
 };
 
-// обработчик клика на метку похожего объявления
-mapPinsElement.addEventListener('click', onPinClick);
-
+// функция деактивации
+var deactivationFields = function (arr) {
+  arr.forEach(function (item) {
+    item.setAttribute('disabled', '');
+  });
+};
 
 // функция изначально приводит страницу в неактивное состоние
 var setInactiveState = function () {
-  for (var i = 0; i < adFieldsets.length; i++) {
-    adFieldsets[i].setAttribute('disabled', '');
-  }
-  for (i = 0; i < mapFiltersFields.length; i++) {
-    mapFiltersFields[i].setAttribute('disabled', '');
-  }
-  var locationX = Math.round(mainPin.offsetLeft + mainPin.offsetWidth / 2);
-  var locationY = Math.round(mainPin.offsetTop + mainPin.offsetHeight / 2);
-  adAdress.setAttribute('value', locationX + ', ' + locationY);
-  adAdress.setAttribute('readonly', '');
+  deactivationFields(adFieldsets);
+  deactivationFields(mapFiltersFields);
+  adAddress.setAttribute('value', calculateLocation());
+  adAddress.setAttribute('readonly', '');
 };
 
 setInactiveState();
+
+// обработчик клика на метку похожего объявления
+// mapPinsElement.addEventListener('click', onPinClick);
+
+// обработчик отпускания мышью метки адреса
+mainPin.addEventListener('mouseup', onMainPinMouseup);
