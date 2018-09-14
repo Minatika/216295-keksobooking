@@ -62,15 +62,15 @@ var cardTemplateElement = document.querySelector('#card')
 
 var adForm = document.querySelector('.ad-form');
 var adFieldsets = adForm.querySelectorAll('.ad-form-header, .ad-form__element');
-var adAddress = adForm.querySelector('input[name=address]');
+var adAddress = adForm.querySelector('[name=address]');
 
 var mapFiltersForm = document.querySelector('.map__filters');
 var mapFiltersFields = mapFiltersForm.querySelectorAll('.map__filter, .map__features');
 
-var popup = 0;
-var popupClose = 0;
+var popup;
+var popupClose;
 
-var activePin = 0;
+var activePin;
 
 // функция получения рандомного значения между min и max
 var getRandomValue = function (min, max) {
@@ -146,7 +146,7 @@ var renderPin = function (card) {
   pinElement.style = 'left: ' + (card.x - widthPin / 2) + 'px; top: ' + (card.y - heightPin) + 'px;';
   imgPin.src = card.avatar;
   imgPin.alt = card.title;
-  pinElement.params = card;
+  pinElement.addEventListener('click', onPinClick(pinElement, card), false);
   return pinElement;
 };
 
@@ -172,6 +172,7 @@ var renderPhoto = function (value) {
 var renderCard = function (card) {
   var cardElement = cardTemplateElement.cloneNode(true);
   var avatarElement = cardElement.querySelector('.popup__avatar');
+  popupClose = cardElement.querySelector('.popup__close');
   var titleElement = cardElement.querySelector('.popup__title');
   var addressElemnt = cardElement.querySelector('.popup__text--address');
   var priceElement = cardElement.querySelector('.popup__text--price');
@@ -199,6 +200,9 @@ var renderCard = function (card) {
   for (i = 0; i < card.photos.length; i++) {
     photosContainer.appendChild(renderPhoto(card.photos[i]));
   }
+  popup = cardElement;
+  popupClose.addEventListener('click', onPopupCloseClick);
+  document.addEventListener('keydown', onPopupPressEsc);
   return cardElement;
 };
 
@@ -214,9 +218,7 @@ var renderPins = function (arr) {
 // функция отрисовки карточки похожего объявления
 var renderCardElement = function (card) {
   var fragment = document.createDocumentFragment();
-  popup = renderCard(card);
-  popupClose = popup.querySelector('.popup__close');
-  fragment.appendChild(popup);
+  fragment.appendChild(renderCard(card));
   map.insertBefore(fragment, mapFilters);
 };
 
@@ -239,10 +241,6 @@ var calculateLocation = function () {
 var getSimilarPins = function () {
   var cards = getCards(cardParams.COUNT, mapPinsElement);
   renderPins(cards);
-  var similarPins = mapPinsElement.querySelectorAll('.map__pin:not(.map__pin--main)');
-  similarPins.forEach(function (item) {
-    item.addEventListener('click', onPinClick);
-  });
 };
 
 // функция-обработчик отпускания мышью метки адреса
@@ -259,9 +257,10 @@ var onMainPinMouseup = function () {
 var closePopup = function () {
   activePin.classList.remove('map__pin--active');
   map.removeChild(popup);
-  popup = 0;
-  popupClose = 0;
-  activePin = 0;
+  popup = null;
+  popupClose = null;
+  activePin = null;
+  document.removeEventListener('keydown', onPopupPressEsc);
 };
 
 // функция-обработчик клика по кнопке закрытия карточки
@@ -277,22 +276,21 @@ var onPopupPressEsc = function (evt) {
 };
 
 // функция отрисовки попапа
-var renderPopup = function (pin) {
-  renderCardElement(pin.params);
+var renderPopup = function (card, pin) {
+  renderCardElement(card);
   pin.classList.add('map__pin--active');
   activePin = pin;
-  popupClose.addEventListener('click', onPopupCloseClick);
-  document.addEventListener('keydown', onPopupPressEsc);
 };
 
 // функция-обработчик нажатия на метку похожего объявления
-var onPinClick = function (evt) {
-  var target = evt.target;
-  if (popup) {
-    closePopup();
-  }
-  var pinCurrent = target.classList.contains('map__pin') ? target : target.parentElement;
-  renderPopup(pinCurrent);
+var onPinClick = function (pinNode, card) {
+  return function () {
+    if (popup) {
+      closePopup();
+    }
+    var pinCurrent = pinNode.classList.contains('map__pin') ? pinNode : pinNode.parentElement;
+    renderPopup(card, pinCurrent);
+  };
 };
 
 // функция деактивации
