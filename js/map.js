@@ -67,6 +67,11 @@ var adAddress = adForm.querySelector('input[name=address]');
 var mapFiltersForm = document.querySelector('.map__filters');
 var mapFiltersFields = mapFiltersForm.querySelectorAll('.map__filter, .map__features');
 
+var popup = 0;
+var popupClose = 0;
+
+var activePin = 0;
+
 // функция получения рандомного значения между min и max
 var getRandomValue = function (min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
@@ -209,7 +214,9 @@ var renderPins = function (arr) {
 // функция отрисовки карточки похожего объявления
 var renderCardElement = function (card) {
   var fragment = document.createDocumentFragment();
-  fragment.appendChild(renderCard(card));
+  popup = renderCard(card);
+  popupClose = popup.querySelector('.popup__close');
+  fragment.appendChild(popup);
   map.insertBefore(fragment, mapFilters);
 };
 
@@ -250,9 +257,11 @@ var onMainPinMouseup = function () {
 
 // функция удаляет popup из DOMа
 var closePopup = function () {
-  var activePin = map.querySelector('.map__pin--active');
   activePin.classList.remove('map__pin--active');
-  map.removeChild(map.querySelector('.popup'));
+  map.removeChild(popup);
+  popup = 0;
+  popupClose = 0;
+  activePin = 0;
 };
 
 // функция-обработчик клика по кнопке закрытия карточки
@@ -267,17 +276,23 @@ var onPopupPressEsc = function (evt) {
   }
 };
 
+// функция отрисовки попапа
+var renderPopup = function (pin) {
+  renderCardElement(pin.params);
+  pin.classList.add('map__pin--active');
+  activePin = pin;
+  popupClose.addEventListener('click', onPopupCloseClick);
+  document.addEventListener('keydown', onPopupPressEsc);
+};
+
 // функция-обработчик нажатия на метку похожего объявления
 var onPinClick = function (evt) {
   var target = evt.target;
-  if (map.querySelector('.popup')) {
+  if (popup) {
     closePopup();
   }
-  var pin = target.classList.contains('map__pin') ? target : target.parentElement;
-  renderCardElement(pin.params);
-  pin.classList.add('map__pin--active');
-  map.querySelector('.popup__close').addEventListener('click', onPopupCloseClick);
-  document.addEventListener('keydown', onPopupPressEsc);
+  var pinCurrent = target.classList.contains('map__pin') ? target : target.parentElement;
+  renderPopup(pinCurrent);
 };
 
 // функция деактивации
