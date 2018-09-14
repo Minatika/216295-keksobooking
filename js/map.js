@@ -141,7 +141,7 @@ var renderPin = function (card) {
   pinElement.style = 'left: ' + (card.x - widthPin / 2) + 'px; top: ' + (card.y - heightPin) + 'px;';
   imgPin.src = card.avatar;
   imgPin.alt = card.title;
-  pinElement.mycard = card;
+  pinElement.params = card;
   return pinElement;
 };
 
@@ -214,10 +214,11 @@ var renderCardElement = function (card) {
 };
 
 // функция активации полей
-var activationFields = function (arr) {
+var activationBlock = function (arr, element, className) {
   arr.forEach(function (item) {
     item.removeAttribute('disabled');
   });
+  element.classList.remove(className);
 };
 
 // функция вычисления координат для поля Адрес
@@ -227,20 +228,23 @@ var calculateLocation = function () {
   return locationX + ', ' + locationY;
 };
 
+// функция добавляет метки похожих объявлений
+var getSimilarPins = function () {
+  var cards = getCards(cardParams.COUNT, mapPinsElement);
+  renderPins(cards);
+  var similarPins = mapPinsElement.querySelectorAll('.map__pin:not(.map__pin--main)');
+  similarPins.forEach(function (item) {
+    item.addEventListener('click', onPinClick);
+  });
+};
+
 // функция-обработчик отпускания мышью метки адреса
 var onMainPinMouseup = function () {
   if (map.classList.contains('map--faded')) {
-    var cards = getCards(cardParams.COUNT, mapPinsElement);
-    renderPins(cards);
-    var similarPins = mapPinsElement.querySelectorAll('.map__pin:not(.map__pin--main)');
-    similarPins.forEach(function (item) {
-      item.addEventListener('click', onPinClick);
-    });
+    getSimilarPins();
   }
-  map.classList.remove('map--faded');
-  adForm.classList.remove('ad-form--disabled');
-  activationFields(adFieldsets);
-  activationFields(mapFiltersFields);
+  activationBlock(adFieldsets, map, 'map--faded');
+  activationBlock(mapFiltersFields, adForm, 'ad-form--disabled');
   adAddress.value = calculateLocation();
 };
 
@@ -269,8 +273,8 @@ var onPinClick = function (evt) {
   if (map.querySelector('.popup')) {
     closePopup();
   }
-  var pin = target.childrenElementCount ? target : target.parentElement;
-  renderCardElement(pin.mycard);
+  var pin = target.classList.contains('map__pin') ? target : target.parentElement;
+  renderCardElement(pin.params);
   pin.classList.add('map__pin--active');
   map.querySelector('.popup__close').addEventListener('click', onPopupCloseClick);
   document.addEventListener('keydown', onPopupPressEsc);
@@ -292,9 +296,6 @@ var setInactiveState = function () {
 };
 
 setInactiveState();
-
-// обработчик клика на метку похожего объявления
-// mapPinsElement.addEventListener('click', onPinClick);
 
 // обработчик отпускания мышью метки адреса
 mainPin.addEventListener('mouseup', onMainPinMouseup);
