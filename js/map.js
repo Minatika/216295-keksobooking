@@ -146,7 +146,7 @@ var renderPin = function (card) {
   pinElement.style = 'left: ' + (card.x - widthPin / 2) + 'px; top: ' + (card.y - heightPin) + 'px;';
   imgPin.src = card.avatar;
   imgPin.alt = card.title;
-  pinElement.addEventListener('click', onPinClick(pinElement, card), false);
+  pinElement.addEventListener('click', onPinClick(pinElement, card));
   return pinElement;
 };
 
@@ -223,7 +223,7 @@ var renderCardElement = function (card) {
 };
 
 // функция активации полей
-var activationBlock = function (arr, element, className) {
+var activateBlock = function (arr, element, className) {
   arr.forEach(function (item) {
     item.removeAttribute('disabled');
   });
@@ -248,8 +248,8 @@ var onMainPinMouseup = function () {
   if (map.classList.contains('map--faded')) {
     getSimilarPins();
   }
-  activationBlock(adFieldsets, map, 'map--faded');
-  activationBlock(mapFiltersFields, adForm, 'ad-form--disabled');
+  activateBlock(adFieldsets, map, 'map--faded');
+  activateBlock(mapFiltersFields, adForm, 'ad-form--disabled');
   adAddress.value = calculateLocation();
 };
 
@@ -294,7 +294,7 @@ var onPinClick = function (pinNode, card) {
 };
 
 // функция деактивации
-var deactivationFields = function (arr) {
+var deactivateFields = function (arr) {
   arr.forEach(function (item) {
     item.setAttribute('disabled', '');
   });
@@ -302,8 +302,8 @@ var deactivationFields = function (arr) {
 
 // функция изначально приводит страницу в неактивное состоние
 var setInactiveState = function () {
-  deactivationFields(adFieldsets);
-  deactivationFields(mapFiltersFields);
+  deactivateFields(adFieldsets);
+  deactivateFields(mapFiltersFields);
   adAddress.setAttribute('value', calculateLocation());
   adAddress.setAttribute('readonly', '');
 };
