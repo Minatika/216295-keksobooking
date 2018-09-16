@@ -59,6 +59,13 @@ var photoParams = {
   CLASS_NAME: 'popup__photo'
 };
 
+var countParams = {
+  '1': ['1'],
+  '2': ['1', '2'],
+  '3': ['1', '2', '3'],
+  '100': ['0']
+};
+
 var map = document.querySelector('.map');
 var mapPinsElement = document.querySelector('.map__pins');
 var mapPinElement = document.querySelector('.map__pin');
@@ -79,7 +86,6 @@ var adType = adForm.querySelector('[name=type]');
 var adPrice = adForm.querySelector('[name=price]');
 var adTimeIn = adForm.querySelector('[name=timein]');
 var adTimeOut = adForm.querySelector('[name=timeout]');
-var adTime = adForm.querySelector('.ad-form__element--time');
 var adRooms = adForm.querySelector('[name=rooms]');
 var adCapacity = adForm.querySelector('[name=capacity]');
 
@@ -264,37 +270,28 @@ var getSimilarPins = function () {
 
 // функция-обработчик изменения поля Тип
 var onTypeChange = function () {
-  var minPriceSelected = typesOffer[adType.options[adType.selectedIndex].value].MIN_PRICE;
+  var minPriceSelected = typesOffer[adType.value].MIN_PRICE;
   adPrice.setAttribute('placeholder', minPriceSelected);
   adPrice.setAttribute('min', minPriceSelected);
 };
 
-// функция-обработчик изменения полей времени
-var onTimeChange = function (evt) {
-  if (evt.target === adTimeIn) {
-    adTimeOut.value = adTimeIn.value;
-  } else {
-    adTimeIn.value = adTimeOut.value;
-  }
+// функция-обработчик изменения поля время заезда
+var onTimeInChange = function () {
+  adTimeOut.value = adTimeIn.value;
+};
+
+// функция-обработчик изменения поля выезда
+var onTimeOutChange = function () {
+  adTimeIn.value = adTimeOut.value;
 };
 
 // функция-обработчик изменений поля кол-во комнат
 var onCountChange = function () {
-  var rooms = parseInt(adRooms.value, 10);
-  var capacity = parseInt(adCapacity.value, 10);
-  if (rooms === 100 && capacity !== 0) {
-    adCapacity.setCustomValidity('Для 100 комнат следует выбрать значение "не для гостей"');
-  } else {
-    if (rooms !== 100 && capacity === 0) {
-      adCapacity.setCustomValidity('Необходимо указать количество гостей');
-    } else {
-      if (capacity > rooms) {
-        adCapacity.setCustomValidity('Количество гостей не может превышать количество комнат');
-      } else {
-        adCapacity.setCustomValidity('');
-      }
-    }
-  }
+  var rooms = adRooms.value;
+  var capacity = adCapacity.value;
+  var message = (countParams[rooms].indexOf(capacity) === -1) ?
+    'Количество гостей соответствует количеству комнат' : '';
+  adCapacity.setCustomValidity(message);
 };
 
 // функция-обработчик отпускания мышью метки адреса
@@ -306,7 +303,8 @@ var onMainPinMouseup = function () {
   activateBlock(mapFiltersFields, adForm, 'ad-form--disabled');
   adAddress.value = calculateLocation();
   adType.addEventListener('change', onTypeChange);
-  adTime.addEventListener('change', onTimeChange);
+  adTimeIn.addEventListener('change', onTimeInChange);
+  adTimeOut.addEventListener('change', onTimeOutChange);
   adRooms.addEventListener('change', onCountChange);
   adCapacity.addEventListener('change', onCountChange);
 };
