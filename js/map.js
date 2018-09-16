@@ -27,10 +27,22 @@ var cardParams = {
 };
 
 var typesOffer = {
-  'palace': 'Дворец',
-  'flat': 'Квартира',
-  'house': 'Дом',
-  'bungalo': 'Бунгало'
+  'palace': {
+    DESIGNATION: 'Дворец',
+    MIN_PRICE: 10000
+  },
+  'flat': {
+    DESIGNATION: 'Квартира',
+    MIN_PRICE: 1000
+  },
+  'house': {
+    DESIGNATION: 'Дом',
+    MIN_PRICE: 5000
+  },
+  'bungalo': {
+    DESIGNATION: 'Бунгало',
+    MIN_PRICE: 0
+  }
 };
 
 var capacityParams = {
@@ -45,6 +57,13 @@ var photoParams = {
   IMAGE_HEIGHT: 40,
   ALT_TEXT: 'Фотография жилья',
   CLASS_NAME: 'popup__photo'
+};
+
+var countParams = {
+  '1': ['1'],
+  '2': ['1', '2'],
+  '3': ['1', '2', '3'],
+  '100': ['0']
 };
 
 var map = document.querySelector('.map');
@@ -63,6 +82,12 @@ var cardTemplateElement = document.querySelector('#card')
 var adForm = document.querySelector('.ad-form');
 var adFieldsets = adForm.querySelectorAll('.ad-form-header, .ad-form__element');
 var adAddress = adForm.querySelector('[name=address]');
+var adType = adForm.querySelector('[name=type]');
+var adPrice = adForm.querySelector('[name=price]');
+var adTimeIn = adForm.querySelector('[name=timein]');
+var adTimeOut = adForm.querySelector('[name=timeout]');
+var adRooms = adForm.querySelector('[name=rooms]');
+var adCapacity = adForm.querySelector('[name=capacity]');
 
 var mapFiltersForm = document.querySelector('.map__filters');
 var mapFiltersFields = mapFiltersForm.querySelectorAll('.map__filter, .map__features');
@@ -186,7 +211,7 @@ var renderCard = function (card) {
   titleElement.textContent = card.title;
   addressElemnt.textContent = card.address;
   priceElement.textContent = card.price + String.fromCharCode('8381') + '/ночь';
-  typeElement.textContent = typesOffer[card.type];
+  typeElement.textContent = typesOffer[card.type].DESIGNATION;
   capacityElement.textContent = card.rooms + ' комнаты для ' + card.guests + ' гостей';
   timeElement.textContent = 'Заезд после ' + card.checkin + ', выезд до ' + card.checkout;
   if (card.features.length) {
@@ -243,6 +268,32 @@ var getSimilarPins = function () {
   renderPins(cards);
 };
 
+// функция-обработчик изменения поля Тип
+var onTypeChange = function () {
+  var minPriceSelected = typesOffer[adType.value].MIN_PRICE;
+  adPrice.setAttribute('placeholder', minPriceSelected);
+  adPrice.setAttribute('min', minPriceSelected);
+};
+
+// функция-обработчик изменения поля время заезда
+var onTimeInChange = function () {
+  adTimeOut.value = adTimeIn.value;
+};
+
+// функция-обработчик изменения поля выезда
+var onTimeOutChange = function () {
+  adTimeIn.value = adTimeOut.value;
+};
+
+// функция-обработчик изменений поля кол-во комнат
+var onCountChange = function () {
+  var rooms = adRooms.value;
+  var capacity = adCapacity.value;
+  var message = (countParams[rooms].indexOf(capacity) === -1) ?
+    'Количество гостей соответствует количеству комнат' : '';
+  adCapacity.setCustomValidity(message);
+};
+
 // функция-обработчик отпускания мышью метки адреса
 var onMainPinMouseup = function () {
   if (map.classList.contains('map--faded')) {
@@ -251,6 +302,11 @@ var onMainPinMouseup = function () {
   activateBlock(adFieldsets, map, 'map--faded');
   activateBlock(mapFiltersFields, adForm, 'ad-form--disabled');
   adAddress.value = calculateLocation();
+  adType.addEventListener('change', onTypeChange);
+  adTimeIn.addEventListener('change', onTimeInChange);
+  adTimeOut.addEventListener('change', onTimeOutChange);
+  adRooms.addEventListener('change', onCountChange);
+  adCapacity.addEventListener('change', onCountChange);
 };
 
 // функция удаляет popup из DOMа
@@ -305,7 +361,6 @@ var setInactiveState = function () {
   deactivateFields(adFieldsets);
   deactivateFields(mapFiltersFields);
   adAddress.setAttribute('value', calculateLocation());
-  adAddress.setAttribute('readonly', '');
 };
 
 setInactiveState();
