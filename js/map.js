@@ -59,6 +59,11 @@ var photoParams = {
   CLASS_NAME: 'popup__photo'
 };
 
+var mainPinSize = {
+  WIDTH: 62,
+  HEIGHT: 79
+};
+
 var countParams = {
   '1': ['1'],
   '2': ['1', '2'],
@@ -263,8 +268,8 @@ var activateBlock = function (arr, element, className) {
 
 // функция вычисления координат для поля Адрес
 var calculateLocation = function () {
-  var locationX = Math.round(mainPin.offsetLeft + mainPin.offsetWidth / 2);
-  var locationY = mainPin.offsetTop + mainPin.offsetHeight;
+  var locationX = Math.round(mainPin.offsetLeft + mainPinSize.WIDTH / 2);
+  var locationY = mainPin.offsetTop + mainPinSize.HEIGHT;
   return locationX + ', ' + locationY;
 };
 
@@ -300,31 +305,31 @@ var onCountChange = function () {
   adCapacity.setCustomValidity(message);
 };
 
+// функция возвращает число в пределах заданного диапазона
+var getValueInRange = function (value, min, max) {
+  if (value < min) {
+    value = min;
+  }
+  if (value > max) {
+    value = max;
+  }
+  return value;
+};
+
+// функция возвращает координаты в пределах ограничений
+var getCoordsInParent = function (coordX, coordY, limit) {
+  var coords = {
+    x: getValueInRange(coordX, limit.xMin, limit.xMax),
+    y: getValueInRange(coordY, limit.yMin, limit.yMax)
+  };
+  return coords;
+};
+
 // функция-обработчик захвата мышью метки адреса
 var onMainPinMouseDown = function (evt) {
   var startCoords = {
     x: evt.clientX,
     y: evt.clientY
-  };
-
-  // функция возвращает число в пределах заданного диапазона
-  var getValueInRange = function (value, min, max) {
-    if (value < min) {
-      value = min;
-    }
-    if (value > max) {
-      value = max;
-    }
-    return value;
-  };
-
-  // функция возвращает координаты в пределах ограничений
-  var getCoordsInParent = function (coordX, coordY, limit) {
-    var coords = {
-      x: getValueInRange(coordX, limit.xMin, limit.xMax),
-      y: getValueInRange(coordY, limit.yMin, limit.yMax)
-    };
-    return coords;
   };
 
   // функция-обработчик перемещения мышью метки адреса
