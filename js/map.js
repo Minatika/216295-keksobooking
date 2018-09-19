@@ -59,6 +59,11 @@ var photoParams = {
   CLASS_NAME: 'popup__photo'
 };
 
+var mainPinSize = {
+  WIDTH: 62,
+  HEIGHT: 79
+};
+
 var countParams = {
   '1': ['1'],
   '2': ['1', '2'],
@@ -96,6 +101,12 @@ var popup;
 var popupClose;
 
 var activePin;
+var pinCoordLimits = {
+  xMin: 0,
+  xMax: mapPinsElement.offsetWidth - mapPinElement.offsetWidth,
+  yMin: cardParams.Y_MIN,
+  yMax: cardParams.Y_MAX
+};
 
 // функция получения рандомного значения между min и max
 var getRandomValue = function (min, max) {
@@ -257,8 +268,8 @@ var activateBlock = function (arr, element, className) {
 
 // функция вычисления координат для поля Адрес
 var calculateLocation = function () {
-  var locationX = Math.round(mainPin.offsetLeft + mainPin.offsetWidth / 2);
-  var locationY = mainPin.offsetTop + mainPin.offsetHeight;
+  var locationX = Math.round(mainPin.offsetLeft + mainPinSize.WIDTH / 2);
+  var locationY = mainPin.offsetTop + mainPinSize.HEIGHT;
   return locationX + ', ' + locationY;
 };
 
@@ -294,14 +305,63 @@ var onCountChange = function () {
   adCapacity.setCustomValidity(message);
 };
 
-// функция-обработчик отпускания мышью метки адреса
-var onMainPinMouseup = function () {
+// функция возвращает число в пределах заданного диапазона
+var getValueInRange = function (value, min, max) {
+  if (value < min) {
+    value = min;
+  }
+  if (value > max) {
+    value = max;
+  }
+  return value;
+};
+
+// функция возвращает координаты в пределах ограничений
+var getCoordsInParent = function (coordX, coordY, limit) {
+  var coords = {
+    x: getValueInRange(coordX, limit.xMin, limit.xMax),
+    y: getValueInRange(coordY, limit.yMin, limit.yMax)
+  };
+  return coords;
+};
+
+// функция-обработчик захвата мышью метки адреса
+var onMainPinMouseDown = function (evt) {
+  var startCoords = {
+    x: evt.clientX,
+    y: evt.clientY
+  };
+
+  // функция-обработчик перемещения мышью метки адреса
+  var onMainPinMouseMove = function (moveEvt) {
+    var shift = {
+      x: startCoords.x - moveEvt.clientX,
+      y: startCoords.y - moveEvt.clientY
+    };
+    startCoords = {
+      x: moveEvt.clientX,
+      y: moveEvt.clientY
+    };
+    var changedCoords = getCoordsInParent(mainPin.offsetLeft - shift.x, mainPin.offsetTop - shift.y, pinCoordLimits);
+    mainPin.style.top = (changedCoords.y) + 'px';
+    mainPin.style.left = (changedCoords.x) + 'px';
+    adAddress.value = calculateLocation();
+  };
+
+  // функция-обработчик отпускания мышью метки адреса
+  var onMainPinMouseUp = function () {
+    document.removeEventListener('mousemove', onMainPinMouseMove);
+    document.removeEventListener('mouseup', onMainPinMouseUp);
+  };
+
   if (map.classList.contains('map--faded')) {
+    activateBlock(adFieldsets, map, 'map--faded');
+    activateBlock(mapFiltersFields, adForm, 'ad-form--disabled');
     getSimilarPins();
   }
-  activateBlock(adFieldsets, map, 'map--faded');
-  activateBlock(mapFiltersFields, adForm, 'ad-form--disabled');
   adAddress.value = calculateLocation();
+  document.addEventListener('mousemove', onMainPinMouseMove);
+  document.addEventListener('mouseup', onMainPinMouseUp);
   adType.addEventListener('change', onTypeChange);
   adTimeIn.addEventListener('change', onTimeInChange);
   adTimeOut.addEventListener('change', onTimeOutChange);
@@ -366,4 +426,4 @@ var setInactiveState = function () {
 setInactiveState();
 
 // обработчик отпускания мышью метки адреса
-mainPin.addEventListener('mouseup', onMainPinMouseup);
+mainPin.addEventListener('mousedown', onMainPinMouseDown);
