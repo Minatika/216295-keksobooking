@@ -9,6 +9,13 @@
     '100': ['0']
   };
 
+  var typesOffer = {
+    'palace': 10000,
+    'flat': 1000,
+    'house': 5000,
+    'bungalo': 0
+  };
+
   var adType = document.querySelector('[name=type]');
   var adPrice = document.querySelector('[name=price]');
   var adTimeIn = document.querySelector('[name=timein]');
@@ -18,7 +25,7 @@
 
   // функция-обработчик изменения поля Тип
   var onTypeChange = function () {
-    var minPriceSelected = window.data.typesOffer[adType.value].MIN_PRICE;
+    var minPriceSelected = typesOffer[adType.value];
     adPrice.setAttribute('placeholder', minPriceSelected);
     adPrice.setAttribute('min', minPriceSelected);
   };
@@ -51,8 +58,6 @@
     adCapacity.addEventListener('change', onCountChange);
   };
 
-  window.form = {
-    addHandlersFields: addHandlersFields
-  };
+  window.addHandlersFields = addHandlersFields;
 
 })();

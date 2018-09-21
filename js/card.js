@@ -1,6 +1,6 @@
 'use strict';
 
-// отрисовывает карточку попап
+// отрисовка и события попапа
 (function () {
   var photoParams = {
     IMAGE_WIDTH: 45,
@@ -9,15 +9,23 @@
     CLASS_NAME: 'popup__photo'
   };
 
+  var typesOffer = {
+    'palace': 'Дворец',
+    'flat': 'Квартира',
+    'house': 'Дом',
+    'bungalo': 'Бунгало'
+  };
+
   var FEATURE_CLASS = 'popup__feature';
+
   var popup;
   var popupClose;
-  var activePin;
 
   var cardTemplateElement = document.querySelector('#card')
     .content
     .querySelector('.map__card');
   var mapFilters = document.querySelector('.map__filters-container');
+  var map = document.querySelector('.map');
 
   // функция создания ноды элемента li
   var renderFeatures = function (value) {
@@ -38,10 +46,10 @@
   };
 
   // функция создания в DOMе объявления и заполнения его данными
-  var renderCard = function (card) {
+  var renderCard = function (card, pin) {
     var cardElement = cardTemplateElement.cloneNode(true);
     var avatarElement = cardElement.querySelector('.popup__avatar');
-    window.card.popupClose = cardElement.querySelector('.popup__close');
+    popupClose = cardElement.querySelector('.popup__close');
     var titleElement = cardElement.querySelector('.popup__title');
     var addressElemnt = cardElement.querySelector('.popup__text--address');
     var priceElement = cardElement.querySelector('.popup__text--price');
@@ -55,7 +63,7 @@
     titleElement.textContent = card.title;
     addressElemnt.textContent = card.address;
     priceElement.textContent = card.price + String.fromCharCode('8381') + '/ночь';
-    typeElement.textContent = window.data.typesOffer[card.type].DESIGNATION;
+    typeElement.textContent = typesOffer[card.type];
     capacityElement.textContent = card.rooms + ' комнаты для ' + card.guests + ' гостей';
     timeElement.textContent = 'Заезд после ' + card.checkin + ', выезд до ' + card.checkout;
     if (card.features.length) {
@@ -69,32 +77,55 @@
     for (i = 0; i < card.photos.length; i++) {
       photosContainer.appendChild(renderPhoto(card.photos[i]));
     }
-    window.card.popup = cardElement;
-    window.card.popupClose.addEventListener('click', window.map.onPopupCloseClick);
-    document.addEventListener('keydown', window.map.onPopupPressEsc);
+    popup = cardElement;
+    popupClose.addEventListener('click', onPopupCloseClick(pin));
+    document.addEventListener('keydown', onPopupPressEsc(pin));
     return cardElement;
   };
 
   // функция отрисовки карточки похожего объявления
-  var renderCardElement = function (card) {
+  var renderCardElement = function (card, pin) {
     var fragment = document.createDocumentFragment();
-    fragment.appendChild(renderCard(card));
-    window.map.map.insertBefore(fragment, mapFilters);
+    fragment.appendChild(renderCard(card, pin));
+    map.insertBefore(fragment, mapFilters);
   };
 
   // функция отрисовки попапа
   var renderPopup = function (card, pin) {
-    renderCardElement(card);
+    if (popup) {
+      closePopup();
+    }
+    renderCardElement(card, pin);
     pin.classList.add('map__pin--active');
-    window.card.activePin = pin;
+  };
+
+  // функция удаляет popup из DOMа
+  var closePopup = function () {
+    map.removeChild(popup);
+    popup = null;
+    popupClose = null;
+    document.removeEventListener('keydown', onPopupPressEsc);
+  };
+
+  // функция-обработчик клика по кнопке закрытия карточки
+  var onPopupCloseClick = function (pin) {
+    return function () {
+      closePopup();
+      pin.classList.remove('map__pin--active');
+    };
+  };
+
+  // функция-обработчик нажатия на Esc
+  var onPopupPressEsc = function (pin) {
+    return function (evt) {
+      if (evt.keyCode === 27) {
+        closePopup();
+        pin.classList.remove('map__pin--active');
+      }
+    };
   };
 
   // экспортируемый объект
-  window.card = {
-    popup: popup,
-    popupClose: popupClose,
-    activePin: activePin,
-    renderPopup: renderPopup
-  };
+  window.renderPopup = renderPopup;
 
 })();
