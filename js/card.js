@@ -2,6 +2,9 @@
 
 // отрисовка и события попапа
 (function () {
+  var FEATURE_CLASS = 'popup__feature';
+  var ESC_KEYCODE = 27;
+
   var photoParams = {
     IMAGE_WIDTH: 45,
     IMAGE_HEIGHT: 40,
@@ -16,16 +19,14 @@
     'bungalo': 'Бунгало'
   };
 
-  var FEATURE_CLASS = 'popup__feature';
-
   var popup;
   var popupClose;
 
   var cardTemplateElement = document.querySelector('#card')
     .content
     .querySelector('.map__card');
-  var mapFilters = document.querySelector('.map__filters-container');
-  var map = document.querySelector('.map');
+  var mapFiltersElement = document.querySelector('.map__filters-container');
+  var mapElement = document.querySelector('.map');
 
   // функция создания ноды элемента li
   var renderFeatures = function (value) {
@@ -67,16 +68,16 @@
     capacityElement.textContent = card.rooms + ' комнаты для ' + card.guests + ' гостей';
     timeElement.textContent = 'Заезд после ' + card.checkin + ', выезд до ' + card.checkout;
     if (card.features.length) {
-      for (var i = 0; i < card.features.length; i++) {
-        featuresContainer.appendChild(renderFeatures(card.features[i]));
-      }
+      card.features.forEach(function (item) {
+        featuresContainer.appendChild(renderFeatures(item));
+      });
     } else {
       cardElement.removeChild(featuresContainer);
     }
     descriptionElement.textContent = card.description;
-    for (i = 0; i < card.photos.length; i++) {
-      photosContainer.appendChild(renderPhoto(card.photos[i]));
-    }
+    card.photos.forEach(function (item) {
+      photosContainer.appendChild(renderPhoto(item));
+    });
     popup = cardElement;
     popupClose.addEventListener('click', onPopupCloseClick(pin));
     document.addEventListener('keydown', onPopupPressEsc(pin));
@@ -87,7 +88,7 @@
   var renderCardElement = function (card, pin) {
     var fragment = document.createDocumentFragment();
     fragment.appendChild(renderCard(card, pin));
-    map.insertBefore(fragment, mapFilters);
+    mapElement.insertBefore(fragment, mapFiltersElement);
   };
 
   // функция отрисовки попапа
@@ -101,7 +102,7 @@
 
   // функция удаляет popup из DOMа
   var closePopup = function () {
-    map.removeChild(popup);
+    mapElement.removeChild(popup);
     popup = null;
     popupClose = null;
     document.removeEventListener('keydown', onPopupPressEsc);
@@ -118,7 +119,7 @@
   // функция-обработчик нажатия на Esc
   var onPopupPressEsc = function (pin) {
     return function (evt) {
-      if (evt.keyCode === 27) {
+      if (evt.keyCode === ESC_KEYCODE) {
         closePopup();
         pin.classList.remove('map__pin--active');
       }

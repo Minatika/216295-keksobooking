@@ -26,9 +26,9 @@
   // функция отрисовки сгенерированных меток
   var renderPins = function (arr) {
     var fragment = document.createDocumentFragment();
-    for (var i = 0; i < arr.length; i++) {
-      fragment.appendChild(renderPin(arr[i]));
-    }
+    arr.forEach(function (item) {
+      fragment.appendChild(renderPin(item));
+    });
     mapPinsElement.appendChild(fragment);
   };
 

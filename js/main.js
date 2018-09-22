@@ -7,11 +7,11 @@
     HEIGHT: 79
   };
 
-  var map = document.querySelector('.map');
-  var mainPin = document.querySelector('.map__pin--main');
-  var adAddress = document.querySelector('[name=address]');
-  var mapPinsElement = document.querySelector('.map__pins');
-  var mapPinElement = document.querySelector('.map__pin');
+  var mapElement = document.querySelector('.map');
+  var mainPinElement = mapElement.querySelector('.map__pin--main');
+  var adAddressElement = document.querySelector('[name=address]');
+  var mapPinsElement = mapElement.querySelector('.map__pins');
+  var mapPinElement = mapPinsElement.querySelector('.map__pin');
 
   var pinCoordLimits = {
     xMin: 0,
@@ -40,10 +40,10 @@
     return coords;
   };
 
-  // функция вычисления координат для поля Адрес
-  var calculateLocation = function () {
-    var locationX = Math.round(mainPin.offsetLeft + mainPinSize.WIDTH / 2);
-    var locationY = mainPin.offsetTop + mainPinSize.HEIGHT;
+  // функция вычисления координат MainPin
+  var getCoordsMainPin = function () {
+    var locationX = Math.round(mainPinElement.offsetLeft + mainPinSize.WIDTH / 2);
+    var locationY = mainPinElement.offsetTop + mainPinSize.HEIGHT;
     return locationX + ', ' + locationY;
   };
 
@@ -64,10 +64,10 @@
         x: moveEvt.clientX,
         y: moveEvt.clientY
       };
-      var changedCoords = getCoordsInParent(mainPin.offsetLeft - shift.x, mainPin.offsetTop - shift.y, pinCoordLimits);
-      mainPin.style.top = (changedCoords.y) + 'px';
-      mainPin.style.left = (changedCoords.x) + 'px';
-      adAddress.value = calculateLocation();
+      var changedCoords = getCoordsInParent(mainPinElement.offsetLeft - shift.x, mainPinElement.offsetTop - shift.y, pinCoordLimits);
+      mainPinElement.style.top = (changedCoords.y) + 'px';
+      mainPinElement.style.left = (changedCoords.x) + 'px';
+      adAddressElement.value = getCoordsMainPin();
     };
 
     // функция-обработчик отпускания мышью метки адреса
@@ -76,19 +76,19 @@
       document.removeEventListener('mouseup', onMainPinMouseUp);
     };
 
-    if (map.classList.contains('map--faded')) {
+    if (mapElement.classList.contains('map--faded')) {
       window.setActiveState();
     }
-    adAddress.value = calculateLocation();
+    adAddressElement.value = getCoordsMainPin();
     document.addEventListener('mousemove', onMainPinMouseMove);
     document.addEventListener('mouseup', onMainPinMouseUp);
-    window.addHandlersFields();
+    window.synchonizeFields();
   };
 
-  // экспортируемый метод
-  window.calculateLocation = calculateLocation;
-
   // обработчик захвата мышью метки адреса
-  mainPin.addEventListener('mousedown', onMainPinMouseDown);
+  mainPinElement.addEventListener('mousedown', onMainPinMouseDown);
+
+  // экспортируемый метод
+  window.getCoordsMainPin = getCoordsMainPin;
 
 })();

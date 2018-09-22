@@ -3,13 +3,13 @@
 // управляет пинами и карточками объявлений
 (function () {
   var COUNT = 8;
-  var map = document.querySelector('.map');
-  var adFieldsets = document.querySelectorAll('.ad-form-header, .ad-form__element');
-  var adAddress = document.querySelector('[name=address]');
+  var mapElement = document.querySelector('.map');
+  var adFieldsetsElements = document.querySelectorAll('.ad-form-header, .ad-form__element');
+  var adAddressElement = document.querySelector('[name=address]');
   var mapPinsElement = document.querySelector('.map__pins');
 
-  var adForm = document.querySelector('.ad-form');
-  var mapFiltersFields = document.querySelectorAll('.map__filter, .map__features');
+  var adFormElement = document.querySelector('.ad-form');
+  var mapFiltersFieldsElements = document.querySelectorAll('.map__filter, .map__features');
 
   // функция заполнения массива похожих объявлений
   var getCards = function (count, parentElement) {
@@ -43,21 +43,21 @@
 
   // функция приводит страницу в активное состоние
   var setActiveState = function () {
-    activateBlock(adFieldsets, map, 'map--faded');
-    activateBlock(mapFiltersFields, adForm, 'ad-form--disabled');
+    activateBlock(adFieldsetsElements, mapElement, 'map--faded');
+    activateBlock(mapFiltersFieldsElements, adFormElement, 'ad-form--disabled');
     getSimilarPins();
   };
 
   // функция изначально приводит страницу в неактивное состоние
   var setInactiveState = function () {
-    deactivateFields(adFieldsets);
-    deactivateFields(mapFiltersFields);
-    adAddress.setAttribute('value', window.calculateLocation());
+    deactivateFields(adFieldsetsElements);
+    deactivateFields(mapFiltersFieldsElements);
+    adAddressElement.value = window.getCoordsMainPin();
   };
+
+  setInactiveState();
 
   // экспортируемый объект
   window.setActiveState = setActiveState;
-
-  setInactiveState();
 
 })();

@@ -16,48 +16,49 @@
     'bungalo': 0
   };
 
-  var adType = document.querySelector('[name=type]');
-  var adPrice = document.querySelector('[name=price]');
-  var adTimeIn = document.querySelector('[name=timein]');
-  var adTimeOut = document.querySelector('[name=timeout]');
-  var adRooms = document.querySelector('[name=rooms]');
-  var adCapacity = document.querySelector('[name=capacity]');
+  var adTypeElement = document.querySelector('[name=type]');
+  var adPriceElement = document.querySelector('[name=price]');
+  var adTimeInElement = document.querySelector('[name=timein]');
+  var adTimeOutElement = document.querySelector('[name=timeout]');
+  var adRoomsElement = document.querySelector('[name=rooms]');
+  var adCapacityElement = document.querySelector('[name=capacity]');
 
   // функция-обработчик изменения поля Тип
   var onTypeChange = function () {
-    var minPriceSelected = typesOffer[adType.value];
-    adPrice.setAttribute('placeholder', minPriceSelected);
-    adPrice.setAttribute('min', minPriceSelected);
+    var minPriceSelected = typesOffer[adTypeElement.value];
+    adPriceElement.placeholder = minPriceSelected;
+    adPriceElement.min = minPriceSelected;
   };
 
   // функция-обработчик изменения поля время заезда
   var onTimeInChange = function () {
-    adTimeOut.value = adTimeIn.value;
+    adTimeOutElement.value = adTimeInElement.value;
   };
 
   // функция-обработчик изменения поля выезда
   var onTimeOutChange = function () {
-    adTimeIn.value = adTimeOut.value;
+    adTimeInElement.value = adTimeOutElement.value;
   };
 
   // функция-обработчик изменений поля кол-во комнат
   var onCountChange = function () {
-    var rooms = adRooms.value;
-    var capacity = adCapacity.value;
+    var rooms = adRoomsElement.value;
+    var capacity = adCapacityElement.value;
     var message = (countParams[rooms].indexOf(capacity) === -1) ?
       'Количество гостей соответствует количеству комнат' : '';
-    adCapacity.setCustomValidity(message);
+    adCapacityElement.setCustomValidity(message);
   };
 
   // функция добавляет обработчики change на поля формы
-  var addHandlersFields = function () {
-    adType.addEventListener('change', onTypeChange);
-    adTimeIn.addEventListener('change', onTimeInChange);
-    adTimeOut.addEventListener('change', onTimeOutChange);
-    adRooms.addEventListener('change', onCountChange);
-    adCapacity.addEventListener('change', onCountChange);
+  var synchonizeFields = function () {
+    adTypeElement.addEventListener('change', onTypeChange);
+    adTimeInElement.addEventListener('change', onTimeInChange);
+    adTimeOutElement.addEventListener('change', onTimeOutChange);
+    adRoomsElement.addEventListener('change', onCountChange);
+    adCapacityElement.addEventListener('change', onCountChange);
   };
 
-  window.addHandlersFields = addHandlersFields;
+  // экспортируемый метод
+  window.synchonizeFields = synchonizeFields;
 
 })();
