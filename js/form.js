@@ -16,12 +16,25 @@
     'bungalo': 0
   };
 
+  var adResetElement = document.querySelector('.ad-form__reset');
+  var adTitleElement = document.querySelector('[name=title]');
   var adTypeElement = document.querySelector('[name=type]');
   var adPriceElement = document.querySelector('[name=price]');
   var adTimeInElement = document.querySelector('[name=timein]');
   var adTimeOutElement = document.querySelector('[name=timeout]');
   var adRoomsElement = document.querySelector('[name=rooms]');
   var adCapacityElement = document.querySelector('[name=capacity]');
+  var adFeaturesElements = document.querySelectorAll('.ad-form [name=features]');
+  var adDescriptionElement = document.querySelector('[name=description]');
+  var adSelects = document.querySelectorAll('.ad-form select');
+
+  var initialValuesSelects = {
+    'type': 'flat',
+    'timein': '12:00',
+    'timeout': '12:00',
+    'rooms': '1',
+    'capacity': '1'
+  };
 
   // функция-обработчик изменения поля Тип
   var onTypeChange = function () {
@@ -49,6 +62,37 @@
     adCapacityElement.setCustomValidity(message);
   };
 
+  // функция сброса значений селектов
+  var resetSelects = function (arr) {
+    arr.forEach(function (element) {
+      element.value = initialValuesSelects[element.name];
+    });
+  };
+
+  // функция очистки блока удобств
+  var clearFeatures = function (arr) {
+    arr.forEach(function (item) {
+      if (item.checked) {
+        item.checked = false;
+      }
+    });
+  };
+
+  // функция очищает поля формы
+  var clearFields = function () {
+    clearFeatures(adFeaturesElements);
+    resetSelects(adSelects);
+    adTitleElement.value = '';
+    adPriceElement.value = '';
+    adDescriptionElement.value = '';
+  };
+
+  // функция-обработчик клика на кнопку очистить
+  var onResetClick = function () {
+    clearFields();
+    window.map.setInactiveState();
+  };
+
   // функция добавляет обработчики change на поля формы
   var synchonizeFields = function () {
     adTypeElement.addEventListener('change', onTypeChange);
@@ -56,6 +100,7 @@
     adTimeOutElement.addEventListener('change', onTimeOutChange);
     adRoomsElement.addEventListener('change', onCountChange);
     adCapacityElement.addEventListener('change', onCountChange);
+    adResetElement.addEventListener('click', onResetClick);
   };
 
   // экспортируемый метод

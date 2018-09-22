@@ -102,10 +102,12 @@
 
   // функция удаляет popup из DOMа
   var closePopup = function () {
-    mapElement.removeChild(popup);
-    popup = null;
-    popupClose = null;
-    document.removeEventListener('keydown', onPopupPressEsc);
+    if (popup) {
+      mapElement.removeChild(popup);
+      popup = null;
+      popupClose = null;
+      document.removeEventListener('keydown', onPopupPressEsc);
+    }
   };
 
   // функция-обработчик клика по кнопке закрытия карточки
@@ -127,6 +129,9 @@
   };
 
   // экспортируемый объект
-  window.renderPopup = renderPopup;
+  window.card = {
+    renderPopup: renderPopup,
+    closePopup: closePopup
+  };
 
 })();

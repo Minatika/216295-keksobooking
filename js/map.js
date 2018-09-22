@@ -3,6 +3,7 @@
 // управляет пинами и карточками объявлений
 (function () {
   var COUNT = 8;
+
   var mapElement = document.querySelector('.map');
   var adFieldsetsElements = document.querySelectorAll('.ad-form-header, .ad-form__element');
   var adAddressElement = document.querySelector('[name=address]');
@@ -11,20 +12,24 @@
   var adFormElement = document.querySelector('.ad-form');
   var mapFiltersFieldsElements = document.querySelectorAll('.map__filter, .map__features');
 
+  var isgetSemilar = false;
+
   // функция заполнения массива похожих объявлений
   var getCards = function (count, parentElement) {
     var arr = [];
     for (var i = 0; i < count; i++) {
       arr.push(window.getCardObject(i, parentElement));
     }
+    isgetSemilar = true;
     return arr;
   };
 
   // функция деактивации полей
-  var deactivateFields = function (arr) {
+  var deactivateFields = function (arr, element, className) {
     arr.forEach(function (item) {
       item.setAttribute('disabled', '');
     });
+    element.classList.add(className);
   };
 
   // функция активации полей
@@ -38,7 +43,7 @@
   // функция добавляет метки похожих объявлений
   var getSimilarPins = function () {
     var cards = getCards(COUNT, mapPinsElement);
-    window.renderPins(cards);
+    window.pins.renderPins(cards);
   };
 
   // функция приводит страницу в активное состоние
@@ -50,14 +55,23 @@
 
   // функция изначально приводит страницу в неактивное состоние
   var setInactiveState = function () {
-    deactivateFields(adFieldsetsElements);
-    deactivateFields(mapFiltersFieldsElements);
-    adAddressElement.value = window.getCoordsMainPin();
+    deactivateFields(adFieldsetsElements, mapElement, 'map--faded');
+    deactivateFields(mapFiltersFieldsElements, adFormElement, 'ad-form--disabled');
+    if (isgetSemilar) {
+      window.pins.deletePins();
+      window.card.closePopup();
+      isgetSemilar = false;
+    }
+    window.main.resetMainPin();
+    adAddressElement.value = window.main.getCoordsMainPin();
   };
 
   setInactiveState();
 
   // экспортируемый объект
-  window.setActiveState = setActiveState;
+  window.map = {
+    setActiveState: setActiveState,
+    setInactiveState: setInactiveState
+  };
 
 })();

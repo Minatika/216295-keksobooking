@@ -16,8 +16,13 @@
   var pinCoordLimits = {
     xMin: 0,
     xMax: mapPinsElement.offsetWidth - mapPinElement.offsetWidth,
-    yMin: 130,
-    yMax: 630
+    yMin: 130 - mainPinSize.HEIGHT,
+    yMax: 630 - mainPinSize.HEIGHT
+  };
+
+  var initialMainPin = {
+    x: mainPinElement.style.left,
+    y: mainPinElement.style.top
   };
 
   // функция возвращает число в пределах заданного диапазона
@@ -77,7 +82,7 @@
     };
 
     if (mapElement.classList.contains('map--faded')) {
-      window.setActiveState();
+      window.map.setActiveState();
     }
     adAddressElement.value = getCoordsMainPin();
     document.addEventListener('mousemove', onMainPinMouseMove);
@@ -85,10 +90,19 @@
     window.synchonizeFields();
   };
 
+  // функция переводит метку в начальное положение
+  var resetMainPin = function () {
+    mainPinElement.style.top = initialMainPin.y;
+    mainPinElement.style.left = initialMainPin.x;
+  };
+
   // обработчик захвата мышью метки адреса
   mainPinElement.addEventListener('mousedown', onMainPinMouseDown);
 
   // экспортируемый метод
-  window.getCoordsMainPin = getCoordsMainPin;
+  window.main = {
+    getCoordsMainPin: getCoordsMainPin,
+    resetMainPin: resetMainPin
+  };
 
 })();
