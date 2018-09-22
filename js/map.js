@@ -12,7 +12,7 @@
   var adFormElement = document.querySelector('.ad-form');
   var mapFiltersFieldsElements = document.querySelectorAll('.map__filter, .map__features');
 
-  var isgetSemilar = false;
+  var isgetSimilar = false;
 
   // функция заполнения массива похожих объявлений
   var getCards = function (count, parentElement) {
@@ -20,7 +20,7 @@
     for (var i = 0; i < count; i++) {
       arr.push(window.getCardObject(i, parentElement));
     }
-    isgetSemilar = true;
+    isgetSimilar = true;
     return arr;
   };
 
@@ -57,10 +57,10 @@
   var setInactiveState = function () {
     deactivateFields(adFieldsetsElements, mapElement, 'map--faded');
     deactivateFields(mapFiltersFieldsElements, adFormElement, 'ad-form--disabled');
-    if (isgetSemilar) {
+    if (isgetSimilar) {
       window.pins.deletePins();
       window.card.closePopup();
-      isgetSemilar = false;
+      isgetSimilar = false;
     }
     window.main.resetMainPin();
     adAddressElement.value = window.main.getCoordsMainPin();

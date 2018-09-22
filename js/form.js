@@ -26,7 +26,7 @@
   var adCapacityElement = document.querySelector('[name=capacity]');
   var adFeaturesElements = document.querySelectorAll('.ad-form [name=features]');
   var adDescriptionElement = document.querySelector('[name=description]');
-  var adSelects = document.querySelectorAll('.ad-form select');
+  var adSelectsElements = document.querySelectorAll('.ad-form select');
 
   var initialValuesSelects = {
     'type': 'flat',
@@ -81,7 +81,7 @@
   // функция очищает поля формы
   var clearFields = function () {
     clearFeatures(adFeaturesElements);
-    resetSelects(adSelects);
+    resetSelects(adSelectsElements);
     adTitleElement.value = '';
     adPriceElement.value = '';
     adDescriptionElement.value = '';

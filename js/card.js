@@ -93,9 +93,7 @@
 
   // функция отрисовки попапа
   var renderPopup = function (card, pin) {
-    if (popup) {
-      closePopup();
-    }
+    closePopup();
     renderCardElement(card, pin);
     pin.classList.add('map__pin--active');
   };
