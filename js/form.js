@@ -16,17 +16,26 @@
     'bungalo': 0
   };
 
-  var adResetElement = document.querySelector('.ad-form__reset');
-  var adTitleElement = document.querySelector('[name=title]');
-  var adTypeElement = document.querySelector('[name=type]');
-  var adPriceElement = document.querySelector('[name=price]');
-  var adTimeInElement = document.querySelector('[name=timein]');
-  var adTimeOutElement = document.querySelector('[name=timeout]');
-  var adRoomsElement = document.querySelector('[name=rooms]');
-  var adCapacityElement = document.querySelector('[name=capacity]');
-  var adFeaturesElements = document.querySelectorAll('.ad-form [name=features]');
-  var adDescriptionElement = document.querySelector('[name=description]');
-  var adSelectsElements = document.querySelectorAll('.ad-form select');
+  var adFormElement = document.querySelector('.ad-form');
+  var adResetElement = adFormElement.querySelector('.ad-form__reset');
+  var adTitleElement = adFormElement.querySelector('[name=title]');
+  var adTypeElement = adFormElement.querySelector('[name=type]');
+  var adPriceElement = adFormElement.querySelector('[name=price]');
+  var adTimeInElement = adFormElement.querySelector('[name=timein]');
+  var adTimeOutElement = adFormElement.querySelector('[name=timeout]');
+  var adRoomsElement = adFormElement.querySelector('[name=rooms]');
+  var adCapacityElement = adFormElement.querySelector('[name=capacity]');
+  var adFeaturesElements = adFormElement.querySelectorAll('[name=features]');
+  var adDescriptionElement = adFormElement.querySelector('[name=description]');
+  var adSelectsElements = adFormElement.querySelectorAll('select');
+
+  var mainElement = document.querySelector('main');
+  var successTemplateElement = document.querySelector('#success')
+      .content
+      .querySelector('.success');
+  var errorTemplateElement = document.querySelector('#error')
+      .content
+      .querySelector('.error');
 
   var initialValuesSelects = {
     'type': 'flat',
@@ -93,7 +102,7 @@
     window.map.setInactiveState();
   };
 
-  // функция добавляет обработчики change на поля формы
+  // функция добавляет обработчики для синхронизации полей формы
   var synchonizeFields = function () {
     adTypeElement.addEventListener('change', onTypeChange);
     adTimeInElement.addEventListener('change', onTimeInChange);
@@ -102,6 +111,27 @@
     adCapacityElement.addEventListener('change', onCountChange);
     adResetElement.addEventListener('click', onResetClick);
   };
+
+  // функция-коллбэк ошибки при отправке формы
+  var onError = function (errorMessage) {
+    window.utils.renderMessageElement(mainElement, errorTemplateElement, errorMessage);
+  };
+
+  // функция-коллбэк успешной отправки формы
+  var onLoad = function () {
+    clearFields();
+    window.map.setInactiveState();
+    window.utils.renderMessageElement(mainElement, successTemplateElement);
+  };
+
+  // функция-обработчик отправки формы
+  var onFormSubmit = function (evt) {
+    evt.preventDefault();
+    window.backend.save(new FormData(adFormElement), onLoad, onError);
+  };
+
+  // обработчик отправки формы объявления
+  adFormElement.addEventListener('submit', onFormSubmit);
 
   // экспортируемый метод
   window.synchonizeFields = synchonizeFields;

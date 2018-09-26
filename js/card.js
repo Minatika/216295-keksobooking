@@ -3,7 +3,6 @@
 // отрисовка и события попапа
 (function () {
   var FEATURE_CLASS = 'popup__feature';
-  var ESC_KEYCODE = 27;
 
   var photoParams = {
     IMAGE_WIDTH: 45,
@@ -60,22 +59,22 @@
     var featuresContainer = cardElement.querySelector('.popup__features');
     var descriptionElement = cardElement.querySelector('.popup__description');
     var photosContainer = cardElement.querySelector('.popup__photos');
-    avatarElement.src = card.avatar;
-    titleElement.textContent = card.title;
-    addressElemnt.textContent = card.address;
-    priceElement.textContent = card.price + String.fromCharCode('8381') + '/ночь';
-    typeElement.textContent = typesOffer[card.type];
-    capacityElement.textContent = card.rooms + ' комнаты для ' + card.guests + ' гостей';
-    timeElement.textContent = 'Заезд после ' + card.checkin + ', выезд до ' + card.checkout;
-    if (card.features.length) {
-      card.features.forEach(function (item) {
+    avatarElement.src = card.author.avatar;
+    titleElement.textContent = card.offer.title;
+    addressElemnt.textContent = card.offer.address;
+    priceElement.textContent = card.offer.price + String.fromCharCode('8381') + '/ночь';
+    typeElement.textContent = typesOffer[card.offer.type];
+    capacityElement.textContent = card.offer.rooms + ' комнаты для ' + card.offer.guests + ' гостей';
+    timeElement.textContent = 'Заезд после ' + card.offer.checkin + ', выезд до ' + card.offer.checkout;
+    if (card.offer.features.length) {
+      card.offer.features.forEach(function (item) {
         featuresContainer.appendChild(renderFeatures(item));
       });
     } else {
       cardElement.removeChild(featuresContainer);
     }
-    descriptionElement.textContent = card.description;
-    card.photos.forEach(function (item) {
+    descriptionElement.textContent = card.offer.description;
+    card.offer.photos.forEach(function (item) {
       photosContainer.appendChild(renderPhoto(item));
     });
     popup = cardElement;
@@ -93,36 +92,35 @@
 
   // функция отрисовки попапа
   var renderPopup = function (card, pin) {
-    closePopup();
+    closePopup(pin);
     renderCardElement(card, pin);
     pin.classList.add('map__pin--active');
   };
 
   // функция удаляет popup из DOMа
-  var closePopup = function () {
+  var closePopup = function (pin) {
     if (popup) {
       mapElement.removeChild(popup);
       popup = null;
       popupClose = null;
       document.removeEventListener('keydown', onPopupPressEsc);
     }
+    if (pin) {
+      pin.classList.remove('map__pin--active');
+    }
   };
 
   // функция-обработчик клика по кнопке закрытия карточки
   var onPopupCloseClick = function (pin) {
     return function () {
-      closePopup();
-      pin.classList.remove('map__pin--active');
+      closePopup(pin);
     };
   };
 
   // функция-обработчик нажатия на Esc
   var onPopupPressEsc = function (pin) {
     return function (evt) {
-      if (evt.keyCode === ESC_KEYCODE) {
-        closePopup();
-        pin.classList.remove('map__pin--active');
-      }
+      window.utils.isEscEvent(evt, closePopup, pin);
     };
   };
 
