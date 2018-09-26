@@ -17,9 +17,9 @@
     var widthPin = mapPinElement.offsetWidth;
     var heightPin = mapPinElement.offsetHeight;
     var imgPin = pinElement.querySelector('img');
-    pinElement.style = 'left: ' + (card.x - widthPin / 2) + 'px; top: ' + (card.y - heightPin) + 'px;';
-    imgPin.src = card.avatar;
-    imgPin.alt = card.title;
+    pinElement.style = 'left: ' + (card.location.x - widthPin / 2) + 'px; top: ' + (card.location.y - heightPin) + 'px;';
+    imgPin.src = card.author.avatar;
+    imgPin.alt = card.offer.title;
     pinElement.addEventListener('click', onPinClick(pinElement, card));
     similarPins.push(pinElement);
     return pinElement;
