@@ -3,8 +3,6 @@
 (function () {
   var ESC_KEYCODE = 27;
 
-  var mainElement = document.querySelector('main');
-
   // функция получения рандомного значения между min и max
   var getRandomValue = function (min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
@@ -51,7 +49,8 @@
 
   // функция закрывает сообщение о результате отправки формы
   var closeMessage = function (messageElement) {
-    mainElement.removeChild(messageElement);
+    var parent = messageElement.parentNode;
+    parent.removeChild(messageElement);
     document.removeEventListener('keydown', onMessageEscPress);
     document.removeEventListener('click', onMessageClick);
   };
@@ -71,8 +70,8 @@
   };
 
   // функция добавляет в DOM сообщение с ошибкой от сервера
-  var renderMessageElement = function (templateElement, message) {
-    mainElement.appendChild(renderMessage(templateElement, message));
+  var renderMessageElement = function (parent, templateElement, message) {
+    parent.appendChild(renderMessage(templateElement, message));
   };
 
   // экспортируемый объект

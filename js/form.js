@@ -29,6 +29,7 @@
   var adDescriptionElement = adFormElement.querySelector('[name=description]');
   var adSelectsElements = adFormElement.querySelectorAll('select');
 
+  var mainElement = document.querySelector('main');
   var successTemplateElement = document.querySelector('#success')
       .content
       .querySelector('.success');
@@ -113,14 +114,14 @@
 
   // функция-коллбэк ошибки при отправке формы
   var onError = function (errorMessage) {
-    window.utils.renderMessageElement(errorTemplateElement, errorMessage);
+    window.utils.renderMessageElement(mainElement, errorTemplateElement, errorMessage);
   };
 
   // функция-коллбэк успешной отправки формы
   var onLoad = function () {
     clearFields();
     window.map.setInactiveState();
-    window.utils.renderMessageElement(successTemplateElement);
+    window.utils.renderMessageElement(mainElement, successTemplateElement);
   };
 
   // функция-обработчик отправки формы
