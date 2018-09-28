@@ -9,11 +9,6 @@
   var adFormElement = document.querySelector('.ad-form');
   var mapFiltersFieldsElements = document.querySelectorAll('.map__filter, .map__features');
 
-  var mainElement = document.querySelector('main');
-  var errorTemplateElement = document.querySelector('#error')
-      .content
-      .querySelector('.error');
-
   var isGotPins = false;
 
   // функция деактивации полей
@@ -32,28 +27,18 @@
     element.classList.remove(className);
   };
 
-  // функция-коллбэк ошибки получения данных с сервера
-  var onError = function (errorMessage) {
-    window.utils.renderMessageElement(mainElement, errorTemplateElement, errorMessage);
-    setInactiveState();
-  };
-
-  // функция-коллбэк успешного получения данных с сервера
-  var onLoad = function (cards) {
-    window.pins.renderPins(cards);
-    isGotPins = true;
-  };
-
   // функция добавляет метки похожих объявлений
   var getPins = function () {
-    window.backend.load(onLoad, onError);
+    window.updatePins();
+    isGotPins = true;
   };
 
   // функция приводит страницу в активное состоние
   var setActiveState = function () {
     getPins();
-    activateBlock(adFieldsetsElements, mapElement, 'map--faded');
-    activateBlock(mapFiltersFieldsElements, adFormElement, 'ad-form--disabled');
+    window.filters.activateFilters();
+    activateBlock(mapFiltersFieldsElements, mapElement, 'map--faded');
+    activateBlock(adFieldsetsElements, adFormElement, 'ad-form--disabled');
   };
 
   // функция изначально приводит страницу в неактивное состоние
