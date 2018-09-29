@@ -49,10 +49,12 @@
 
   // функция закрывает сообщение о результате отправки формы
   var closeMessage = function (messageElement) {
-    var parent = messageElement.parentNode;
-    parent.removeChild(messageElement);
-    document.removeEventListener('keydown', onMessageEscPress);
-    document.removeEventListener('click', onMessageClick);
+    if (messageElement) {
+      var parent = messageElement.parentNode;
+      parent.removeChild(messageElement);
+      document.removeEventListener('keydown', onMessageEscPress);
+      document.removeEventListener('click', onMessageClick);
+    }
   };
 
   // функция создания в DOMе сообщения и вывод в него сообщения об ошибке
@@ -74,12 +76,22 @@
     parent.appendChild(renderMessage(templateElement, message));
   };
 
+  // функция очистки блока с чек-боксами
+  var clearCheckboxes = function (arr) {
+    arr.forEach(function (item) {
+      if (item.checked) {
+        item.checked = false;
+      }
+    });
+  };
+
   // экспортируемый объект
   window.utils = {
     shuffleArray: shuffleArray,
     getRandomValue: getRandomValue,
     isEscEvent: isEscEvent,
-    renderMessageElement: renderMessageElement
+    renderMessageElement: renderMessageElement,
+    clearCheckboxes: clearCheckboxes
   };
 
 })();

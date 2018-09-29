@@ -9,7 +9,13 @@
   var adFormElement = document.querySelector('.ad-form');
   var mapFiltersFieldsElements = document.querySelectorAll('.map__filter, .map__features');
 
+  var mainElement = document.querySelector('main');
+  var errorTemplateElement = document.querySelector('#error')
+      .content
+      .querySelector('.error');
+
   var isGotPins = false;
+  var cards = [];
 
   // функция деактивации полей
   var deactivateFields = function (arr, element, className) {
@@ -27,18 +33,30 @@
     element.classList.remove(className);
   };
 
-  // функция добавляет метки похожих объявлений
-  var getPins = function () {
-    window.updatePins();
+  // функция-коллбэк ошибки получения данных с сервера
+  var onError = function (errorMessage) {
+    window.utils.renderMessageElement(mainElement, errorTemplateElement, errorMessage);
+    setInactiveState();
+  };
+
+  // функция-коллбэк успешного получения данных с сервера
+  var onLoad = function (data) {
+    cards = data;
+    window.filters.updatePins();
     isGotPins = true;
+  };
+
+  // функция получает данные с сервера
+  var getPins = function () {
+    window.backend.load(onLoad, onError);
   };
 
   // функция приводит страницу в активное состоние
   var setActiveState = function () {
     getPins();
-    window.filters.activateFilters();
     activateBlock(mapFiltersFieldsElements, mapElement, 'map--faded');
     activateBlock(adFieldsetsElements, adFormElement, 'ad-form--disabled');
+    window.filters.enableFilters();
   };
 
   // функция изначально приводит страницу в неактивное состоние
@@ -50,8 +68,15 @@
       window.card.closePopup();
       isGotPins = false;
     }
+    window.filters.resetFilters();
+    window.filters.disableFilters();
     window.main.resetMainPin();
     adAddressElement.value = window.main.getCoordsMainPin();
+  };
+
+  // функция возвращает массив объектов, полученных с сервера
+  var getCards = function () {
+    return cards;
   };
 
   setInactiveState();
@@ -59,7 +84,8 @@
   // экспортируемый объект
   window.map = {
     setActiveState: setActiveState,
-    setInactiveState: setInactiveState
+    setInactiveState: setInactiveState,
+    getCards: getCards
   };
 
 })();
