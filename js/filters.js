@@ -3,9 +3,20 @@
 // работа фильтра пинов
 (function () {
   var COUNT_CARDS = 5;
+
   var priceParams = {
-    MIN: 10000,
-    MAX: 50000
+    'low': {
+      MIN: 0,
+      MAX: 9999
+    },
+    'middle': {
+      MIN: 10000,
+      MAX: 50000
+    },
+    'high': {
+      MIN: 50001,
+      MAX: Infinity
+    }
   };
 
   var filtersFormElement = document.querySelector('.map__filters');
@@ -84,85 +95,45 @@
   };
 
   // функция фильтрует массив объектов по заданному объекту
-  var isfilteredByParam = function (card, param, value) {
-    return card.offer[param] === value ? true : false;
+  var isfilteredByParam = function (param, value) {
+    return param === value;
   };
 
   // функция фильтрует массив по цене
-  var isFilteredByPrice = function (card, value) {
-    var check = false;
-    var price = card.offer.price;
-    switch (value) {
-      case 'middle':
-        if (price >= priceParams.MIN && price <= priceParams.MAX) {
-          check = true;
-        }
-        break;
-      case 'low':
-        if (price < priceParams.MIN) {
-          check = true;
-        }
-        break;
-      case 'high':
-        if (price > priceParams.MAX) {
-          check = true;
-        }
-        break;
-      default:
-        check = false;
-    }
-    return check;
+  var isFilteredByPrice = function (price, value) {
+    return price >= priceParams[value].MIN && price <= priceParams[value].MAX;
   };
 
   // фильтрует массив по удобствам
-  var isFilteredByFeatures = function (card, arr) {
-    var check = true;
-    arr.forEach(function (item) {
-      if (!card.offer.features.includes(item)) {
-        check = false;
-      }
-    });
-    return check;
-  };
-
-  // функция сравнивает объект фильтров с начальными значениями
-  var compareFilters = function () {
-    var arr = [];
-    for (var prop in currentFilter) {
-      if (currentFilter[prop] !== initialFilter[prop]) {
-        arr.push(prop);
+  var isFilteredByFeatures = function (features, arr) {
+    for (var i = 0; i < arr.length; i++) {
+      if (!features.includes(arr[i])) {
+        return false;
       }
     }
-    return arr;
+    return true;
+  };
+
+  // если значение фильтра отличается от начального, функция запускает по нему проверку
+  var checkFilter = function (param, fun, value) {
+    return currentFilter[param] === initialFilter[param] ? true : fun(value, currentFilter[param]);
   };
 
   // функция проверяет, соответствует ли карточка фильтрам
-  var isFilteredCard = function (arr) {
-    return function (card) {
-      var isFiltered = true;
-      arr.forEach(function (item) {
-        switch (item) {
-          case 'price':
-            isFiltered = isFiltered && isFilteredByPrice(card, currentFilter[item]);
-            break;
-          case 'features':
-            isFiltered = isFiltered && isFilteredByFeatures(card, currentFilter[item]);
-            break;
-          default:
-            isFiltered = isFiltered && isfilteredByParam(card, item, currentFilter[item]);
-        }
-      });
-      return isFiltered;
-    };
+  var isFilteredCard = function (card) {
+    return checkFilter('type', isfilteredByParam, card.offer.type)
+    && checkFilter('price', isFilteredByPrice, card.offer.price)
+    && checkFilter('rooms', isfilteredByParam, card.offer.rooms.toString())
+    && checkFilter('guests', isfilteredByParam, card.offer.guests.toString())
+    && checkFilter('features', isFilteredByFeatures, card.offer.features);
   };
 
   // функция обновляет метки объявлений
   var updatePins = function () {
-    var diff = compareFilters();
     cards = window.map.getCards();
     window.pins.deletePins();
     window.card.closePopup();
-    cards = cards.filter(isFilteredCard(diff));
+    cards = cards.filter(isFilteredCard);
     if (cards.length > COUNT_CARDS) {
       window.utils.shuffleArray(cards);
       cards.splice(COUNT_CARDS, cards.length - COUNT_CARDS);
