@@ -15,7 +15,6 @@
       .querySelector('.error');
 
   var isGotPins = false;
-  var cards = [];
 
   // функция деактивации полей
   var deactivateFields = function (arr, element, className) {
@@ -41,9 +40,8 @@
 
   // функция-коллбэк успешного получения данных с сервера
   var onLoad = function (data) {
-    cards = data;
-    window.pins.updatePins(cards);
-    window.filters.enableFilters(cards);
+    window.pins.updatePins(data);
+    window.filters.enableFilters(data);
     isGotPins = true;
   };
 

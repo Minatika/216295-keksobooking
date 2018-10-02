@@ -27,8 +27,6 @@
   var featuresFilterElements = filtersFormElement.querySelectorAll('.map__checkbox');
   var filtersSelectsElements = filtersFormElement.querySelectorAll('select');
 
-  var cards = [];
-
   var initialFilter = {
     type: 'any',
     price: 'any',
@@ -121,12 +119,12 @@
 
   // функция фильтрует массив объектов
   var filterArray = function (arr) {
-    cards = arr.filter(isFilteredCard);
-    if (cards.length > COUNT_CARDS) {
-      window.utils.shuffleArray(cards);
-      cards.splice(COUNT_CARDS, cards.length - COUNT_CARDS);
+    arr = arr.filter(isFilteredCard);
+    if (arr.length > COUNT_CARDS) {
+      window.utils.shuffleArray(arr);
+      arr.splice(COUNT_CARDS, arr.length - COUNT_CARDS);
     }
-    return cards;
+    return arr;
   };
 
   // функция сброса значений селектов
