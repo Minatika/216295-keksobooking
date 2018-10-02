@@ -39,12 +39,13 @@
   };
 
   // функция-коллбэк успешного получения данных с сервера
-  var onLoad = function (cards) {
-    window.pins.renderPins(cards);
+  var onLoad = function (data) {
+    window.pins.updatePins(data);
+    window.filters.enableFilters(data);
     isGotPins = true;
   };
 
-  // функция добавляет метки похожих объявлений
+  // функция получает данные с сервера
   var getPins = function () {
     window.backend.load(onLoad, onError);
   };
@@ -52,8 +53,8 @@
   // функция приводит страницу в активное состоние
   var setActiveState = function () {
     getPins();
-    activateBlock(adFieldsetsElements, mapElement, 'map--faded');
-    activateBlock(mapFiltersFieldsElements, adFormElement, 'ad-form--disabled');
+    activateBlock(mapFiltersFieldsElements, mapElement, 'map--faded');
+    activateBlock(adFieldsetsElements, adFormElement, 'ad-form--disabled');
   };
 
   // функция изначально приводит страницу в неактивное состоние
@@ -65,6 +66,7 @@
       window.card.closePopup();
       isGotPins = false;
     }
+    window.filters.resetFilters();
     window.main.resetMainPin();
     adAddressElement.value = window.main.getCoordsMainPin();
   };
@@ -74,7 +76,7 @@
   // экспортируемый объект
   window.map = {
     setActiveState: setActiveState,
-    setInactiveState: setInactiveState
+    setInactiveState: setInactiveState,
   };
 
 })();

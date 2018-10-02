@@ -78,18 +78,9 @@
     });
   };
 
-  // функция очистки блока удобств
-  var clearFeatures = function (arr) {
-    arr.forEach(function (item) {
-      if (item.checked) {
-        item.checked = false;
-      }
-    });
-  };
-
   // функция очищает поля формы
   var clearFields = function () {
-    clearFeatures(adFeaturesElements);
+    window.utils.clearCheckboxes(adFeaturesElements);
     resetSelects(adSelectsElements);
     adTitleElement.value = '';
     adPriceElement.value = '';
