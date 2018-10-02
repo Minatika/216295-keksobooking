@@ -9,7 +9,7 @@
   var mapPinElement = document.querySelector('.map__pin');
 
   var activePin;
-  var Pins = [];
+  var pins = [];
 
   // функция создания в DOMе меток и заполнения их данными
   var renderPin = function (card) {
@@ -22,7 +22,7 @@
     imgPin.alt = card.offer.title;
     pinElement.addEventListener('click', onPinClick(pinElement, card));
     pinElement.addEventListener('keydown', onPinPressEnter(pinElement, card));
-    Pins.push(pinElement);
+    pins.push(pinElement);
     return pinElement;
   };
 
@@ -37,10 +37,10 @@
 
   // функция удаления меток похожих объявлений из дома
   var deletePins = function () {
-    Pins.forEach(function (item) {
+    pins.forEach(function (item) {
       mapPinsElement.removeChild(item);
     });
-    Pins = [];
+    pins = [];
   };
 
   // функция переводит пин в активное состояние
@@ -68,10 +68,19 @@
     };
   };
 
+  // функция обновляет отрисованные пины
+  var updatePins = function (arr) {
+    var cards = window.filters.filterArray(arr);
+    deletePins();
+    window.card.closePopup();
+    window.pins.renderPins(cards);
+  };
+
   // экспортируемый объект
   window.pins = {
     renderPins: renderPins,
-    deletePins: deletePins
+    deletePins: deletePins,
+    updatePins: updatePins
   };
 
 })();

@@ -25,7 +25,6 @@
   var roomsFilterElement = filtersFormElement.querySelector('[name=housing-rooms]');
   var guestsFilterElement = filtersFormElement.querySelector('[name=housing-guests]');
   var featuresFilterElements = filtersFormElement.querySelectorAll('.map__checkbox');
-  var featuresContainerElement = filtersFormElement.querySelector('.map__features');
   var filtersSelectsElements = filtersFormElement.querySelectorAll('select');
 
   var cards = [];
@@ -63,35 +62,27 @@
     return arr[arr.length - 1];
   };
 
-  // функция-обработчик изменений фильтров-селектов
-  var onSelectChange = function (evt) {
-    var property = getPropertyFilter(evt.target.name);
-    currentFilter[property] = evt.target.value;
-    updatePins();
+  // функция обновляет объект с текущим набором фильтров
+  var updateCurrentFilter = function (obj) {
+    if (obj.classList.contains('map__filter')) {
+      var property = getPropertyFilter(obj.name);
+      currentFilter[property] = obj.value;
+    } else {
+      currentFilter.features = getCheckedElements(featuresFilterElements);
+    }
   };
 
-  // функция-обработчик клика по фильтру удобств
-  var onFeaturesClick = function () {
-    currentFilter.features = getCheckedElements(featuresFilterElements);
-    updatePins();
+  // функция-обработчик изменения в форме фильтров
+  var onFormChange = function (arr) {
+    return function (evt) {
+      updateCurrentFilter(evt.target);
+      window.pins.updatePins(arr);
+    };
   };
 
   // функция активации фильтров
-  var enableFilters = function () {
-    typeFilterElement.addEventListener('change', window.debounce(onSelectChange));
-    priceFilterElement.addEventListener('change', window.debounce(onSelectChange));
-    roomsFilterElement.addEventListener('change', window.debounce(onSelectChange));
-    guestsFilterElement.addEventListener('change', window.debounce(onSelectChange));
-    featuresContainerElement.addEventListener('click', window.debounce(onFeaturesClick));
-  };
-
-  // функция деактивации фильтров
-  var disableFilters = function () {
-    typeFilterElement.removeEventListener('change', onSelectChange);
-    priceFilterElement.removeEventListener('change', onSelectChange);
-    roomsFilterElement.removeEventListener('change', onSelectChange);
-    guestsFilterElement.removeEventListener('change', onSelectChange);
-    featuresContainerElement.removeEventListener('click', onFeaturesClick);
+  var enableFilters = function (arr) {
+    filtersFormElement.addEventListener('change', window.debounce(onFormChange(arr)));
   };
 
   // функция фильтрует массив объектов по заданному объекту
@@ -128,17 +119,14 @@
     && checkFilter('features', isFilteredByFeatures, card.offer.features);
   };
 
-  // функция обновляет метки объявлений
-  var updatePins = function () {
-    cards = window.map.getCards();
-    window.pins.deletePins();
-    window.card.closePopup();
-    cards = cards.filter(isFilteredCard);
+  // функция фильтрует массив объектов
+  var filterArray = function (arr) {
+    cards = arr.filter(isFilteredCard);
     if (cards.length > COUNT_CARDS) {
       window.utils.shuffleArray(cards);
       cards.splice(COUNT_CARDS, cards.length - COUNT_CARDS);
     }
-    window.pins.renderPins(cards);
+    return cards;
   };
 
   // функция сброса значений селектов
@@ -157,9 +145,8 @@
   // экспортируемый объект
   window.filters = {
     enableFilters: enableFilters,
-    disableFilters: disableFilters,
-    updatePins: updatePins,
-    resetFilters: resetFilters
+    resetFilters: resetFilters,
+    filterArray: filterArray
   };
 
 })();

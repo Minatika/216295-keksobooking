@@ -42,7 +42,8 @@
   // функция-коллбэк успешного получения данных с сервера
   var onLoad = function (data) {
     cards = data;
-    window.filters.updatePins();
+    window.pins.updatePins(cards);
+    window.filters.enableFilters(cards);
     isGotPins = true;
   };
 
@@ -56,7 +57,6 @@
     getPins();
     activateBlock(mapFiltersFieldsElements, mapElement, 'map--faded');
     activateBlock(adFieldsetsElements, adFormElement, 'ad-form--disabled');
-    window.filters.enableFilters();
   };
 
   // функция изначально приводит страницу в неактивное состоние
@@ -69,14 +69,8 @@
       isGotPins = false;
     }
     window.filters.resetFilters();
-    window.filters.disableFilters();
     window.main.resetMainPin();
     adAddressElement.value = window.main.getCoordsMainPin();
-  };
-
-  // функция возвращает массив объектов, полученных с сервера
-  var getCards = function () {
-    return cards;
   };
 
   setInactiveState();
@@ -85,7 +79,6 @@
   window.map = {
     setActiveState: setActiveState,
     setInactiveState: setInactiveState,
-    getCards: getCards
   };
 
 })();
