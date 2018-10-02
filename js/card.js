@@ -79,6 +79,7 @@
     });
     popup = cardElement;
     popupClose.addEventListener('click', onPopupCloseClick(pin));
+    popupClose.addEventListener('keydown', onPopupPressEnter(pin));
     document.addEventListener('keydown', onPopupPressEsc(pin));
     return cardElement;
   };
@@ -121,6 +122,13 @@
   var onPopupPressEsc = function (pin) {
     return function (evt) {
       window.utils.isEscEvent(evt, closePopup, pin);
+    };
+  };
+
+  // функция-обработчик нажатия на ENTER
+  var onPopupPressEnter = function (pin) {
+    return function (evt) {
+      window.utils.isEnterEvent(evt, closePopup, pin);
     };
   };
 

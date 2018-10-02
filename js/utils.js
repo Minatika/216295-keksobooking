@@ -1,7 +1,10 @@
 'use strict';
 
 (function () {
-  var ESC_KEYCODE = 27;
+  var keyCodes = {
+    ESC: 27,
+    ENTER: 13
+  };
 
   // функция получения рандомного значения между min и max
   var getRandomValue = function (min, max) {
@@ -21,8 +24,15 @@
 
   // функция-обработчик срабатывает при нажатии на клавишу ESC
   var isEscEvent = function (evt, action, element) {
-    if (evt.keyCode === ESC_KEYCODE) {
+    if (evt.keyCode === keyCodes.ESC) {
       action(element);
+    }
+  };
+
+  // функция-обработчик срабатывает при нажатии на клавишу ENTER
+  var isEnterEvent = function (evt, action, firstElement, secondElement) {
+    if (evt.keyCode === keyCodes.ENTER) {
+      action(firstElement, secondElement);
     }
   };
 
@@ -90,6 +100,7 @@
     shuffleArray: shuffleArray,
     getRandomValue: getRandomValue,
     isEscEvent: isEscEvent,
+    isEnterEvent: isEnterEvent,
     renderMessageElement: renderMessageElement,
     clearCheckboxes: clearCheckboxes
   };

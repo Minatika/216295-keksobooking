@@ -21,6 +21,7 @@
     imgPin.src = card.author.avatar;
     imgPin.alt = card.offer.title;
     pinElement.addEventListener('click', onPinClick(pinElement, card));
+    pinElement.addEventListener('keydown', onPinPressEnter(pinElement, card));
     Pins.push(pinElement);
     return pinElement;
   };
@@ -42,16 +43,28 @@
     Pins = [];
   };
 
+  // функция переводит пин в активное состояние
+  var activatePin = function (pinNode, card) {
+    if (activePin) {
+      activePin.classList.remove('map__pin--active');
+    }
+    var pinCurrent = pinNode.classList.contains('map__pin') ? pinNode : pinNode.parentElement;
+    window.card.renderPopup(card, pinCurrent);
+    pinCurrent.classList.add('map__pin--active');
+    activePin = pinCurrent;
+  };
+
   // функция-обработчик нажатия на метку похожего объявления
   var onPinClick = function (pinNode, card) {
     return function () {
-      if (activePin) {
-        activePin.classList.remove('map__pin--active');
-      }
-      var pinCurrent = pinNode.classList.contains('map__pin') ? pinNode : pinNode.parentElement;
-      window.card.renderPopup(card, pinCurrent);
-      pinCurrent.classList.add('map__pin--active');
-      activePin = pinCurrent;
+      activatePin(pinNode, card);
+    };
+  };
+
+  // функция-обработчик нажатия на ENTER
+  var onPinPressEnter = function (pinNode, card) {
+    return function (evt) {
+      window.utils.isEnterEvent(evt, activatePin, pinNode, card);
     };
   };
 
