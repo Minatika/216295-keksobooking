@@ -6,6 +6,13 @@
     ENTER: 13
   };
 
+  var photoParams = {
+    IMAGE_WIDTH: 45,
+    IMAGE_HEIGHT: 40,
+    ALT_TEXT: 'Фотография жилья'
+  };
+
+
   // функция получения рандомного значения между min и max
   var getRandomValue = function (min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
@@ -20,6 +27,18 @@
       arr[random] = temp;
     }
     return arr;
+  };
+  // функция создания ноды изображения img
+  var renderPhoto = function (value, className) {
+    var image = document.createElement('img');
+    if (className) {
+      image.classList.add(photoParams.CLASS_NAME);
+    }
+    image.src = value;
+    image.width = photoParams.IMAGE_WIDTH;
+    image.height = photoParams.IMAGE_HEIGHT;
+    image.alt = photoParams.ALT_TEXT;
+    return image;
   };
 
   // функция-обработчик срабатывает при нажатии на клавишу ESC
@@ -99,6 +118,7 @@
   window.utils = {
     shuffleArray: shuffleArray,
     getRandomValue: getRandomValue,
+    renderPhoto: renderPhoto,
     isEscEvent: isEscEvent,
     isEnterEvent: isEnterEvent,
     renderMessageElement: renderMessageElement,
