@@ -2,11 +2,11 @@
 
 // управляет пинами и карточками объявлений
 (function () {
-  var mapElement = document.querySelector('.map');
-  var adFieldsetsElements = document.querySelectorAll('.ad-form-header, .ad-form__element');
-  var adAddressElement = document.querySelector('[name=address]');
-
   var adFormElement = document.querySelector('.ad-form');
+  var adFieldsetsElements = document.querySelectorAll('.ad-form-header, .ad-form__element');
+  var adAddressElement = adFormElement.querySelector('[name=address]');
+
+  var mapElement = document.querySelector('.map');
   var mapFiltersFieldsElements = document.querySelectorAll('.map__filter, .map__features');
 
   var mainElement = document.querySelector('main');

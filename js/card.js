@@ -5,8 +5,8 @@
   var FEATURE_CLASS = 'popup__feature';
 
   var photoParams = {
-    IMAGE_WIDTH: 45,
-    IMAGE_HEIGHT: 40,
+    WIDTH: 45,
+    HEIGHT: 40,
     ALT_TEXT: 'Фотография жилья',
     CLASS_NAME: 'popup__photo'
   };
@@ -32,17 +32,6 @@
     var li = document.createElement('li');
     li.classList.add(FEATURE_CLASS, FEATURE_CLASS + '--' + value);
     return li;
-  };
-
-  // функция создания ноды изображения img
-  var renderPhoto = function (value) {
-    var image = document.createElement('img');
-    image.classList.add(photoParams.CLASS_NAME);
-    image.src = value;
-    image.width = photoParams.IMAGE_WIDTH;
-    image.height = photoParams.IMAGE_HEIGHT;
-    image.alt = photoParams.ALT_TEXT;
-    return image;
   };
 
   // функция создания в DOMе объявления и заполнения его данными
@@ -75,7 +64,7 @@
     }
     descriptionElement.textContent = card.offer.description;
     card.offer.photos.forEach(function (item) {
-      photosContainer.appendChild(renderPhoto(item));
+      photosContainer.appendChild(window.utils.renderPhoto(item, photoParams));
     });
     popup = cardElement;
     popupClose.addEventListener('click', onPopupCloseClick(pin));

@@ -2,6 +2,16 @@
 
 // обработчики полей формы
 (function () {
+  var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
+
+  var CONTAINER_CLASS = 'ad-form__photo';
+
+  var photoParams = {
+    WIDTH: 70,
+    HEIGHT: 70,
+    ALT_TEXT: 'Фотография жилья'
+  };
+
   var countParams = {
     '1': ['1'],
     '2': ['1', '2'],
@@ -28,6 +38,18 @@
   var adFeaturesElements = adFormElement.querySelectorAll('[name=features]');
   var adDescriptionElement = adFormElement.querySelector('[name=description]');
   var adSelectsElements = adFormElement.querySelectorAll('select');
+
+  var avatarChooserElement = adFormElement.querySelector('[name=avatar]');
+  var imagesChooserElement = adFormElement.querySelector('[name=images]');
+  var avatarElement = adFormElement.querySelector('.ad-form-header__preview img');
+  var imagesContainerElement = adFormElement.querySelector('.ad-form__photo-container');
+
+  var initialAvatar = {
+    WIDTH: avatarElement.width,
+    HEIGHT: avatarElement.height,
+    SRC: avatarElement.src,
+  };
+  var images = [];
 
   var mainElement = document.querySelector('main');
   var successTemplateElement = document.querySelector('#success')
@@ -78,6 +100,14 @@
     });
   };
 
+  // функция удаления фотографий жилья
+  var deleteImages = function () {
+    images.forEach(function (item) {
+      imagesContainerElement.removeChild(item);
+    });
+    images = [];
+  };
+
   // функция очищает поля формы
   var clearFields = function () {
     window.utils.clearCheckboxes(adFeaturesElements);
@@ -85,6 +115,8 @@
     adTitleElement.value = '';
     adPriceElement.value = '';
     adDescriptionElement.value = '';
+    changeImageAttributes(avatarElement, initialAvatar);
+    deleteImages();
   };
 
   // функция-обработчик клика на кнопку очистить
@@ -121,8 +153,65 @@
     window.backend.save(new FormData(adFormElement), onLoad, onError);
   };
 
+  // функция меняет атрибуты изображения
+  var changeImageAttributes = function (elementNode, obj) {
+    elementNode.src = obj.SRC;
+    elementNode.width = obj.WIDTH;
+    elementNode.height = obj.HEIGHT;
+  };
+
+  // функция добавляет фото в DOM
+  var renderPhoto = function (elementNode, value) {
+    var preview = document.createElement('div');
+    preview.classList.add(CONTAINER_CLASS);
+    preview.appendChild(window.utils.renderPhoto(value, photoParams));
+    images.push(preview);
+    elementNode.appendChild(preview);
+  };
+
+  // функция обрабатывает один файл, выбранный в поле input
+  var readFile = function (file, elementNode) {
+    var fileName = file.name.toLowerCase();
+    var matches = FILE_TYPES.some(function (item) {
+      return fileName.endsWith(item);
+    });
+    if (matches) {
+      var reader = new FileReader();
+      reader.addEventListener('load', function () {
+        if (elementNode.nodeName === 'IMG') {
+          photoParams.SRC = reader.result;
+          changeImageAttributes(elementNode, photoParams);
+        } else {
+          renderPhoto(elementNode, reader.result);
+        }
+      });
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // функция-обработчик изменения состояния поля загрузки файлов
+  var onInputFileChange = function (elementNode) {
+    return function (evt) {
+      if (evt.target.multiple) {
+        var files = evt.target.files;
+        for (var i = 0; i < files.length; i++) {
+          readFile(files[i], elementNode);
+        }
+      } else {
+        var file = evt.target.files[0];
+        readFile(file, elementNode);
+      }
+    };
+  };
+
   // обработчик отправки формы объявления
   adFormElement.addEventListener('submit', onFormSubmit);
+
+  // обработчик изменения фото аватара
+  avatarChooserElement.addEventListener('change', onInputFileChange(avatarElement));
+
+  // обработчик изменения фотографии жилья
+  imagesChooserElement.addEventListener('change', onInputFileChange(imagesContainerElement));
 
   // экспортируемый метод
   window.synchonizeFields = synchonizeFields;

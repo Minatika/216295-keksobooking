@@ -22,6 +22,19 @@
     return arr;
   };
 
+  // функция создания ноды изображения img
+  var renderPhoto = function (value, photoParams) {
+    var image = document.createElement('img');
+    if (photoParams.CLASS_NAME) {
+      image.classList.add(photoParams.CLASS_NAME);
+    }
+    image.src = value;
+    image.width = photoParams.WIDTH;
+    image.height = photoParams.HEIGHT;
+    image.alt = photoParams.ALT_TEXT;
+    return image;
+  };
+
   // функция-обработчик срабатывает при нажатии на клавишу ESC
   var isEscEvent = function (evt, action, element) {
     if (evt.keyCode === keyCodes.ESC) {
@@ -99,6 +112,7 @@
   window.utils = {
     shuffleArray: shuffleArray,
     getRandomValue: getRandomValue,
+    renderPhoto: renderPhoto,
     isEscEvent: isEscEvent,
     isEnterEvent: isEnterEvent,
     renderMessageElement: renderMessageElement,
