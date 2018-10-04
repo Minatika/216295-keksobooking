@@ -5,10 +5,6 @@
   var adFormElement = document.querySelector('.ad-form');
   var adFieldsetsElements = document.querySelectorAll('.ad-form-header, .ad-form__element');
   var adAddressElement = adFormElement.querySelector('[name=address]');
-  var avatarChooserElement = adFormElement.querySelector('[name=avatar]');
-  var imagesChooserElement = adFormElement.querySelector('[name=images]');
-  var avatarElement = adFormElement.querySelector('.ad-form-header__preview img');
-  var imagesElement = adFormElement.querySelector('.ad-form__photo');
 
   var mapElement = document.querySelector('.map');
   var mapFiltersFieldsElements = document.querySelectorAll('.map__filter, .map__features');
@@ -59,8 +55,6 @@
     getPins();
     activateBlock(mapFiltersFieldsElements, mapElement, 'map--faded');
     activateBlock(adFieldsetsElements, adFormElement, 'ad-form--disabled');
-    window.enableFileChooser(avatarChooserElement, avatarElement);
-    window.enableFileChooser(imagesChooserElement, imagesElement);
   };
 
   // функция изначально приводит страницу в неактивное состоние
