@@ -18,6 +18,7 @@
     };
   };
 
+  // экспортируемый метод
   window.debounce = debounce;
 
 })();

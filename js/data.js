@@ -76,7 +76,7 @@
     return card;
   };
 
-  // экспортируемый объект
+  // экспортируемый метод
   window.getCardObject = getCardObject;
 
 })();
