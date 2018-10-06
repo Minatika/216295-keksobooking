@@ -120,7 +120,8 @@
   };
 
   // функция-обработчик клика на кнопку очистить
-  var onResetClick = function () {
+  var onResetClick = function (evt) {
+    evt.preventDefault();
     clearFields();
     window.map.setInactiveState();
   };
