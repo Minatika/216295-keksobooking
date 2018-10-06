@@ -99,7 +99,7 @@
   // обработчик захвата мышью метки адреса
   mainPinElement.addEventListener('mousedown', onMainPinMouseDown);
 
-  // экспортируемый метод
+  // экспортируемый объект
   window.main = {
     getCoordsMainPin: getCoordsMainPin,
     resetMainPin: resetMainPin

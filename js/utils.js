@@ -74,7 +74,9 @@
   var closeMessage = function (messageElement) {
     if (messageElement) {
       var parent = messageElement.parentNode;
-      parent.removeChild(messageElement);
+      if (parent) {
+        parent.removeChild(messageElement);
+      }
       document.removeEventListener('keydown', onMessageEscPress);
       document.removeEventListener('click', onMessageClick);
     }

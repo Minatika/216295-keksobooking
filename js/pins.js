@@ -2,6 +2,8 @@
 
 // отрисовывает метки похожих объявлений
 (function () {
+  var ACTIVE_PIN_CLASS = 'map__pin--active';
+
   var pinTemplateElement = document.querySelector('#pin')
     .content
     .querySelector('.map__pin');
@@ -16,10 +18,10 @@
     var pinElement = pinTemplateElement.cloneNode(true);
     var widthPin = mapPinElement.offsetWidth;
     var heightPin = mapPinElement.offsetHeight;
-    var imgPin = pinElement.querySelector('img');
+    var imgPinElement = pinElement.querySelector('img');
     pinElement.style = 'left: ' + (card.location.x - widthPin / 2) + 'px; top: ' + (card.location.y - heightPin) + 'px;';
-    imgPin.src = card.author.avatar;
-    imgPin.alt = card.offer.title;
+    imgPinElement.src = card.author.avatar;
+    imgPinElement.alt = card.offer.title;
     pinElement.addEventListener('click', onPinClick(pinElement, card));
     pinElement.addEventListener('keydown', onPinPressEnter(pinElement, card));
     pins.push(pinElement);
@@ -46,11 +48,11 @@
   // функция переводит пин в активное состояние
   var activatePin = function (pinNode, card) {
     if (activePin) {
-      activePin.classList.remove('map__pin--active');
+      activePin.classList.remove(ACTIVE_PIN_CLASS);
     }
     var pinCurrent = pinNode.classList.contains('map__pin') ? pinNode : pinNode.parentElement;
     window.card.renderPopup(card, pinCurrent);
-    pinCurrent.classList.add('map__pin--active');
+    pinCurrent.classList.add(ACTIVE_PIN_CLASS);
     activePin = pinCurrent;
   };
 

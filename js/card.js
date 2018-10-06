@@ -3,6 +3,7 @@
 // отрисовка и события попапа
 (function () {
   var FEATURE_CLASS = 'popup__feature';
+  var ACTIVE_PIN_CLASS = 'map__pin--active';
 
   var photoParams = {
     WIDTH: 45,
@@ -18,8 +19,8 @@
     'bungalo': 'Бунгало'
   };
 
-  var popup;
-  var popupClose;
+  var popupElement;
+  var popupCloseElement;
 
   var cardTemplateElement = document.querySelector('#card')
     .content
@@ -38,7 +39,7 @@
   var renderCard = function (card, pin) {
     var cardElement = cardTemplateElement.cloneNode(true);
     var avatarElement = cardElement.querySelector('.popup__avatar');
-    popupClose = cardElement.querySelector('.popup__close');
+    popupCloseElement = cardElement.querySelector('.popup__close');
     var titleElement = cardElement.querySelector('.popup__title');
     var addressElemnt = cardElement.querySelector('.popup__text--address');
     var priceElement = cardElement.querySelector('.popup__text--price');
@@ -66,9 +67,9 @@
     card.offer.photos.forEach(function (item) {
       photosContainer.appendChild(window.utils.renderPhoto(item, photoParams));
     });
-    popup = cardElement;
-    popupClose.addEventListener('click', onPopupCloseClick(pin));
-    popupClose.addEventListener('keydown', onPopupPressEnter(pin));
+    popupElement = cardElement;
+    popupCloseElement.addEventListener('click', onPopupCloseClick(pin));
+    popupCloseElement.addEventListener('keydown', onPopupPressEnter(pin));
     document.addEventListener('keydown', onPopupPressEsc(pin));
     return cardElement;
   };
@@ -84,19 +85,19 @@
   var renderPopup = function (card, pin) {
     closePopup(pin);
     renderCardElement(card, pin);
-    pin.classList.add('map__pin--active');
+    pin.classList.add(ACTIVE_PIN_CLASS);
   };
 
-  // функция удаляет popup из DOMа
+  // функция удаляет popupElement из DOMа
   var closePopup = function (pin) {
-    if (popup) {
-      mapElement.removeChild(popup);
-      popup = null;
-      popupClose = null;
+    if (popupElement) {
+      mapElement.removeChild(popupElement);
+      popupElement = null;
+      popupCloseElement = null;
       document.removeEventListener('keydown', onPopupPressEsc);
     }
     if (pin) {
-      pin.classList.remove('map__pin--active');
+      pin.classList.remove(ACTIVE_PIN_CLASS);
     }
   };
 

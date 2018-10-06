@@ -3,13 +3,18 @@
 // обработчики полей формы
 (function () {
   var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
-
   var CONTAINER_CLASS = 'ad-form__photo';
 
   var photoParams = {
     WIDTH: 70,
     HEIGHT: 70,
     ALT_TEXT: 'Фотография жилья'
+  };
+
+  var initialAvatar = {
+    WIDTH: 40,
+    HEIGHT: 44,
+    SRC: 'img/muffin-grey.svg'
   };
 
   var countParams = {
@@ -44,11 +49,6 @@
   var avatarElement = adFormElement.querySelector('.ad-form-header__preview img');
   var imagesContainerElement = adFormElement.querySelector('.ad-form__photo-container');
 
-  var initialAvatar = {
-    WIDTH: avatarElement.width,
-    HEIGHT: avatarElement.height,
-    SRC: avatarElement.src,
-  };
   var images = [];
 
   var mainElement = document.querySelector('main');

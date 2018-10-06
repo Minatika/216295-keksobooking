@@ -2,6 +2,11 @@
 
 // управляет пинами и карточками объявлений
 (function () {
+  var inactiveClassNames = {
+    MAP: 'map--faded',
+    AD_FORM: 'ad-form--disabled'
+  };
+
   var adFormElement = document.querySelector('.ad-form');
   var adFieldsetsElements = document.querySelectorAll('.ad-form-header, .ad-form__element');
   var adAddressElement = adFormElement.querySelector('[name=address]');
@@ -53,14 +58,14 @@
   // функция приводит страницу в активное состоние
   var setActiveState = function () {
     getPins();
-    activateBlock(mapFiltersFieldsElements, mapElement, 'map--faded');
-    activateBlock(adFieldsetsElements, adFormElement, 'ad-form--disabled');
+    activateBlock(mapFiltersFieldsElements, mapElement, inactiveClassNames.MAP);
+    activateBlock(adFieldsetsElements, adFormElement, inactiveClassNames.AD_FORM);
   };
 
   // функция изначально приводит страницу в неактивное состоние
   var setInactiveState = function () {
-    deactivateFields(adFieldsetsElements, mapElement, 'map--faded');
-    deactivateFields(mapFiltersFieldsElements, adFormElement, 'ad-form--disabled');
+    deactivateFields(adFieldsetsElements, mapElement, inactiveClassNames.MAP);
+    deactivateFields(mapFiltersFieldsElements, adFormElement, inactiveClassNames.AD_FORM);
     if (isGotPins) {
       window.pins.deletePins();
       window.card.closePopup();
